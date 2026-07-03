@@ -26,6 +26,18 @@
             <div class="alert alert-error">{{ $errors->first() }}</div>
         @endif
 
+        <section class="panel">
+            <form class="search-form" method="GET" action="{{ route('barang.index') }}">
+                <label>
+                    <span>Cari Barang</span>
+                    <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari kode atau nama barang, contoh: semen">
+                </label>
+
+                <button type="submit">Cari</button>
+                <a class="secondary-button" href="{{ route('barang.index') }}">Reset</a>
+            </form>
+        </section>
+
         <section class="panel toolbar">
             <div>
                 <strong>Import Excel</strong>
@@ -76,6 +88,28 @@
                     @endforelse
                 </tbody>
             </table>
+
+            @if ($barangs->hasPages())
+                <div class="pagination">
+                    <span>
+                        Menampilkan {{ $barangs->firstItem() }}-{{ $barangs->lastItem() }}
+                        dari {{ $barangs->total() }} barang
+                    </span>
+                    <div class="pagination-links">
+                        @if ($barangs->onFirstPage())
+                            <span class="secondary-button">Sebelumnya</span>
+                        @else
+                            <a class="secondary-button" href="{{ $barangs->previousPageUrl() }}">Sebelumnya</a>
+                        @endif
+
+                        @if ($barangs->hasMorePages())
+                            <a class="secondary-button" href="{{ $barangs->nextPageUrl() }}">Berikutnya</a>
+                        @else
+                            <span class="secondary-button">Berikutnya</span>
+                        @endif
+                    </div>
+                </div>
+            @endif
         </section>
     </main>
 </body>

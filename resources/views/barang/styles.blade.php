@@ -122,6 +122,13 @@
         align-items: end;
     }
 
+    .search-form {
+        display: grid;
+        grid-template-columns: minmax(240px, 1fr) auto auto;
+        gap: 12px;
+        align-items: end;
+    }
+
     .form-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -276,6 +283,10 @@
         }
 
         .filter-form {
+            grid-template-columns: 1fr;
+        }
+
+        .search-form {
             grid-template-columns: 1fr;
         }
 

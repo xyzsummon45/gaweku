@@ -9,11 +9,31 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BarangController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $barangs = Barang::orderBy('id', 'desc')->get();
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
+        ]);
 
-        return view('barang.index', compact('barangs'));
+        $keyword = trim($filters['q'] ?? '');
+
+        $barangs = Barang::query()
+            ->when($keyword !== '', function ($query) use ($keyword) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->where('kode_barang', 'like', "%{$keyword}%")
+                        ->orWhere('nama_barang', 'like', "%{$keyword}%");
+                });
+            })
+            ->orderBy('nama_barang')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('barang.index', [
+            'barangs' => $barangs,
+            'filters' => [
+                'q' => $keyword,
+            ],
+        ]);
     }
 
     public function create()

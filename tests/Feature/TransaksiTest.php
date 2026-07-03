@@ -33,7 +33,7 @@ class TransaksiTest extends TestCase
 
         $response = $this->post('/transaksi', [
             'barang_id' => [$barang->id],
-            'qty' => [3],
+            'qty' => ['0,5'],
         ]);
 
         $transaksi = Transaksi::first();
@@ -41,14 +41,14 @@ class TransaksiTest extends TestCase
         $response->assertRedirect(route('transaksi.show', $transaksi));
         $this->assertDatabaseHas('transaksis', [
             'id' => $transaksi->id,
-            'total' => 60000,
+            'total' => 10000,
         ]);
         $this->assertDatabaseHas('transaksi_items', [
             'transaksi_id' => $transaksi->id,
             'barang_id' => $barang->id,
-            'qty' => 3,
-            'subtotal' => 60000,
+            'qty' => 0.5,
+            'subtotal' => 10000,
         ]);
-        $this->assertSame(7, $barang->fresh()->stok);
+        $this->assertSame('9.500', $barang->fresh()->stok);
     }
 }

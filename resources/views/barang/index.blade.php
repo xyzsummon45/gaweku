@@ -57,7 +57,7 @@
                             <td>{{ $barang->nama_barang }}</td>
                             <td class="number">Rp {{ number_format($barang->harga_beli, 0, ',', '.') }}</td>
                             <td class="number">Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}</td>
-                            <td class="number">{{ $barang->stok }}</td>
+                            <td class="number">{{ rtrim(rtrim(number_format($barang->stok, 3, ',', '.'), '0'), ',') }}</td>
                             <td>
                                 <div class="row-actions">
                                     <a class="secondary-button" href="{{ route('barang.edit', $barang) }}">Edit</a>

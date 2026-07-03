@@ -26,17 +26,24 @@ class TransaksiController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'qty' => array_map(
+                fn ($qty) => str_replace(',', '.', trim((string) $qty)),
+                $request->input('qty', [])
+            ),
+        ]);
+
         $data = $request->validate([
             'barang_id' => ['required', 'array', 'min:1'],
             'barang_id.*' => ['required', 'integer', 'exists:barangs,id'],
             'qty' => ['required', 'array', 'min:1'],
-            'qty.*' => ['required', 'integer', 'min:1'],
+            'qty.*' => ['required', 'numeric', 'min:0.001'],
         ]);
 
         $groupedItems = [];
 
         foreach ($data['barang_id'] as $index => $barangId) {
-            $groupedItems[$barangId] = ($groupedItems[$barangId] ?? 0) + (int) $data['qty'][$index];
+            $groupedItems[$barangId] = ($groupedItems[$barangId] ?? 0) + (float) $data['qty'][$index];
         }
 
         $transaksi = DB::transaction(function () use ($groupedItems) {
@@ -120,7 +127,7 @@ class TransaksiController extends Controller
             'kode_barang' => $barang->kode_barang,
             'nama_barang' => $barang->nama_barang,
             'harga_jual' => (float) $barang->harga_jual,
-            'stok' => $barang->stok,
+            'stok' => (float) $barang->stok,
         ]));
     }
 

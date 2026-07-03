@@ -18,6 +18,7 @@ class TransaksiItem extends Model
 
     protected $casts = [
         'harga_jual' => 'decimal:2',
+        'qty' => 'decimal:3',
         'subtotal' => 'decimal:2',
     ];
 

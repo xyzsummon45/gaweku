@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('kode_barang');
             $table->string('nama_barang');
             $table->decimal('harga_jual', 15, 2);
-            $table->integer('qty');
+            $table->decimal('qty', 15, 3);
             $table->decimal('subtotal', 15, 2);
             $table->timestamps();
         });

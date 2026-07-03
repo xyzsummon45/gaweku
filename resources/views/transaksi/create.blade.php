@@ -32,7 +32,7 @@
 
             <label class="qty-field">
                 <span>Qty</span>
-                <input id="qty-input" type="number" min="1" step="1" value="1">
+                <input id="qty-input" type="text" inputmode="decimal" value="1">
             </label>
 
             <button id="add-item" type="button">Tambah</button>
@@ -156,7 +156,7 @@
         }
 
         function addSelectedItem() {
-            const qty = Number.parseInt(qtyInput.value, 10);
+            const qty = parseDecimal(qtyInput.value);
 
             if (! selectedBarang) {
                 alert('Pilih barang dari autocomplete dulu.');
@@ -164,8 +164,8 @@
                 return;
             }
 
-            if (! Number.isInteger(qty) || qty < 1) {
-                alert('Qty harus minimal 1.');
+            if (! Number.isFinite(qty) || qty < 0.001) {
+                alert('Qty harus lebih dari 0.');
                 qtyInput.focus();
                 return;
             }
@@ -211,7 +211,7 @@
                     <td>${escapeHtml(item.kode_barang)}</td>
                     <td>${escapeHtml(item.nama_barang)}</td>
                     <td class="number">${rupiah.format(item.harga_jual)}</td>
-                    <td class="number">${item.qty}</td>
+                    <td class="number">${formatQty(item.qty)}</td>
                     <td class="number">${rupiah.format(subtotal)}</td>
                     <td class="number"><button class="danger-button" type="button" data-remove="${item.id}">Hapus</button></td>
                 `;
@@ -219,7 +219,7 @@
 
                 hiddenItems.insertAdjacentHTML('beforeend', `
                     <input type="hidden" name="barang_id[]" value="${item.id}">
-                    <input type="hidden" name="qty[]" value="${item.qty}">
+                    <input type="hidden" name="qty[]" value="${formatQtyForInput(item.qty)}">
                 `);
             });
 
@@ -240,6 +240,20 @@
                 .replaceAll('>', '&gt;')
                 .replaceAll('"', '&quot;')
                 .replaceAll("'", '&#039;');
+        }
+
+        function parseDecimal(value) {
+            return Number.parseFloat(String(value).replace(',', '.'));
+        }
+
+        function formatQty(value) {
+            return new Intl.NumberFormat('id-ID', {
+                maximumFractionDigits: 3,
+            }).format(value);
+        }
+
+        function formatQtyForInput(value) {
+            return Number.parseFloat(value).toFixed(3).replace(/\.?0+$/, '');
         }
     </script>
 </body>

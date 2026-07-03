@@ -54,7 +54,7 @@
                             <td>{{ $item->kode_barang }}</td>
                             <td>{{ $item->nama_barang }}</td>
                             <td class="number">Rp {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
-                            <td class="number">{{ $item->qty }}</td>
+                            <td class="number">{{ rtrim(rtrim(number_format($item->qty, 3, ',', '.'), '0'), ',') }}</td>
                             <td class="number">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
                         </tr>
                     @endforeach

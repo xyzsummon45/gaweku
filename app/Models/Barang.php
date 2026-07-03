@@ -14,6 +14,12 @@ class Barang extends Model
         'stok',
     ];
 
+    protected $casts = [
+        'harga_beli' => 'decimal:2',
+        'harga_jual' => 'decimal:2',
+        'stok' => 'decimal:3',
+    ];
+
     public function transaksiItems()
     {
         return $this->hasMany(TransaksiItem::class);

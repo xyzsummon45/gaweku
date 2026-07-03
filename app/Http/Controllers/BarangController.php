@@ -101,7 +101,7 @@ class BarangController extends Controller
                 'nama_barang' => trim((string) $row[$columns['nama_barang']]),
                 'harga_beli' => $this->normalizeNumber($row[$columns['harga_beli']]),
                 'harga_jual' => $this->normalizeNumber($row[$columns['harga_jual']]),
-                'stok' => $this->normalizeInteger($row[$columns['stok']]),
+                'stok' => $this->normalizeNumber($row[$columns['stok']]),
             ];
 
             if (implode('', array_map('strval', $data)) === '') {
@@ -152,7 +152,7 @@ class BarangController extends Controller
             'nama_barang' => ['required', 'string', 'max:255'],
             'harga_beli' => ['required', 'numeric', 'min:0'],
             'harga_jual' => ['required', 'numeric', 'min:0'],
-            'stok' => ['required', 'integer', 'min:0'],
+            'stok' => ['required', 'numeric', 'min:0'],
         ];
     }
 
@@ -161,8 +161,4 @@ class BarangController extends Controller
         return str_replace(',', '.', trim((string) $value));
     }
 
-    private function normalizeInteger(mixed $value): string
-    {
-        return (string) (int) trim((string) $value);
-    }
 }

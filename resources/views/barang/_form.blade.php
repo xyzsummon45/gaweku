@@ -35,7 +35,7 @@
 
     <label>
         <span>Stok</span>
-        <input type="number" name="stok" value="{{ old('stok', $barang->stok) }}" min="0" step="1" required>
+        <input type="number" name="stok" value="{{ old('stok', $barang->stok) }}" min="0" step="0.001" required>
         @error('stok')
             <small>{{ $message }}</small>
         @enderror

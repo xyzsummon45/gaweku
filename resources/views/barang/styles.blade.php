@@ -115,6 +115,13 @@
         align-items: center;
     }
 
+    .filter-form {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(180px, 1fr)) auto auto;
+        gap: 12px;
+        align-items: end;
+    }
+
     .form-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -237,6 +244,22 @@
         padding: 24px;
     }
 
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+        color: #52606d;
+        font-size: 14px;
+    }
+
+    .pagination-links {
+        display: flex;
+        gap: 8px;
+    }
+
     @media (max-width: 720px) {
         .page-header,
         .toolbar {
@@ -249,6 +272,10 @@
         }
 
         .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-form {
             grid-template-columns: 1fr;
         }
 

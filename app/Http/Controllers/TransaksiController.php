@@ -10,13 +10,28 @@ use Illuminate\Validation\ValidationException;
 
 class TransaksiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $transaksis = Transaksi::withCount('items')
-            ->latest('tanggal')
-            ->get();
+        $filters = $request->validate([
+            'tanggal_mulai' => ['nullable', 'date'],
+            'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
+        ]);
 
-        return view('transaksi.index', compact('transaksis'));
+        $transaksis = Transaksi::withCount('items')
+            ->when($filters['tanggal_mulai'] ?? null, function ($query, $tanggalMulai) {
+                $query->whereDate('tanggal', '>=', $tanggalMulai);
+            })
+            ->when($filters['tanggal_selesai'] ?? null, function ($query, $tanggalSelesai) {
+                $query->whereDate('tanggal', '<=', $tanggalSelesai);
+            })
+            ->latest('tanggal')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('transaksi.index', [
+            'transaksis' => $transaksis,
+            'filters' => $filters,
+        ]);
     }
 
     public function create()

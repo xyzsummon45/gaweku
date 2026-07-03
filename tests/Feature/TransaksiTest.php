@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Barang;
 use App\Models\Transaksi;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -50,5 +51,25 @@ class TransaksiTest extends TestCase
             'subtotal' => 10000,
         ]);
         $this->assertSame('9.500', $barang->fresh()->stok);
+    }
+
+    public function test_transaction_history_can_be_filtered_by_date(): void
+    {
+        Transaksi::create([
+            'kode_transaksi' => 'TRX-20260702-0001',
+            'tanggal' => Carbon::parse('2026-07-02 10:00:00'),
+            'total' => 10000,
+        ]);
+
+        Transaksi::create([
+            'kode_transaksi' => 'TRX-20260703-0001',
+            'tanggal' => Carbon::parse('2026-07-03 10:00:00'),
+            'total' => 20000,
+        ]);
+
+        $this->get('/transaksi?tanggal_mulai=2026-07-03&tanggal_selesai=2026-07-03')
+            ->assertOk()
+            ->assertSee('TRX-20260703-0001')
+            ->assertDontSee('TRX-20260702-0001');
     }
 }

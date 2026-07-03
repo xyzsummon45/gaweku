@@ -22,6 +22,27 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
+        @if ($errors->any())
+            <div class="alert alert-error">{{ $errors->first() }}</div>
+        @endif
+
+        <section class="panel">
+            <form class="filter-form" method="GET" action="{{ route('transaksi.index') }}">
+                <label>
+                    <span>Dari Tanggal</span>
+                    <input type="date" name="tanggal_mulai" value="{{ $filters['tanggal_mulai'] ?? '' }}">
+                </label>
+
+                <label>
+                    <span>Sampai Tanggal</span>
+                    <input type="date" name="tanggal_selesai" value="{{ $filters['tanggal_selesai'] ?? '' }}">
+                </label>
+
+                <button type="submit">Cari</button>
+                <a class="secondary-button" href="{{ route('transaksi.index') }}">Reset</a>
+            </form>
+        </section>
+
         <section class="panel table-wrap">
             <table>
                 <thead>
@@ -51,6 +72,28 @@
                     @endforelse
                 </tbody>
             </table>
+
+            @if ($transaksis->hasPages())
+                <div class="pagination">
+                    <span>
+                        Menampilkan {{ $transaksis->firstItem() }}-{{ $transaksis->lastItem() }}
+                        dari {{ $transaksis->total() }} transaksi
+                    </span>
+                    <div class="pagination-links">
+                        @if ($transaksis->onFirstPage())
+                            <span class="secondary-button">Sebelumnya</span>
+                        @else
+                            <a class="secondary-button" href="{{ $transaksis->previousPageUrl() }}">Sebelumnya</a>
+                        @endif
+
+                        @if ($transaksis->hasMorePages())
+                            <a class="secondary-button" href="{{ $transaksis->nextPageUrl() }}">Berikutnya</a>
+                        @else
+                            <span class="secondary-button">Berikutnya</span>
+                        @endif
+                    </div>
+                </div>
+            @endif
         </section>
     </main>
 </body>

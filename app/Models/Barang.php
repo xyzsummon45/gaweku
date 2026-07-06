@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Barang extends Model
 {
     protected $fillable = [
-        'supplier_id',
         'kode_barang',
         'nama_barang',
         'harga_beli',
@@ -26,8 +25,8 @@ class Barang extends Model
         return $this->hasMany(TransaksiItem::class);
     }
 
-    public function supplier()
+    public function pembelianItems()
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->hasMany(PembelianItem::class);
     }
 }

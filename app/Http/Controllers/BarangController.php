@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
-use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -18,14 +17,11 @@ class BarangController extends Controller
 
         $keyword = trim($filters['q'] ?? '');
 
-        $barangs = Barang::with('supplier')
+        $barangs = Barang::query()
             ->when($keyword !== '', function ($query) use ($keyword) {
                 $query->where(function ($query) use ($keyword) {
                     $query->where('kode_barang', 'like', "%{$keyword}%")
-                        ->orWhere('nama_barang', 'like', "%{$keyword}%")
-                        ->orWhereHas('supplier', function ($query) use ($keyword) {
-                            $query->where('nama_supplier', 'like', "%{$keyword}%");
-                        });
+                        ->orWhere('nama_barang', 'like', "%{$keyword}%");
                 });
             })
             ->orderBy('nama_barang')
@@ -44,7 +40,6 @@ class BarangController extends Controller
     {
         return view('barang.create', [
             'barang' => new Barang(),
-            'suppliers' => $this->supplierOptions(),
         ]);
     }
 
@@ -61,7 +56,6 @@ class BarangController extends Controller
     {
         return view('barang.edit', [
             'barang' => $barang,
-            'suppliers' => $this->supplierOptions(),
         ]);
     }
 
@@ -125,7 +119,6 @@ class BarangController extends Controller
         foreach ($rows as $index => $row) {
             $line = $index + 2;
             $data = [
-                'supplier_id' => null,
                 'kode_barang' => trim((string) $row[$columns['kode_barang']]),
                 'nama_barang' => trim((string) $row[$columns['nama_barang']]),
                 'harga_beli' => $this->normalizeNumber($row[$columns['harga_beli']]),
@@ -166,7 +159,6 @@ class BarangController extends Controller
     private function validatedData(Request $request, ?Barang $barang = null): array
     {
         $data = $request->validate($this->rules($barang));
-        $data['supplier_id'] = ($data['supplier_id'] ?? null) ?: null;
 
         return $data;
     }
@@ -181,7 +173,6 @@ class BarangController extends Controller
 
         return [
             'kode_barang' => $codeRules,
-            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
             'nama_barang' => ['required', 'string', 'max:255'],
             'harga_beli' => ['required', 'numeric', 'min:0'],
             'harga_jual' => ['required', 'numeric', 'min:0'],
@@ -194,8 +185,4 @@ class BarangController extends Controller
         return str_replace(',', '.', trim((string) $value));
     }
 
-    private function supplierOptions()
-    {
-        return Supplier::orderBy('nama_supplier')->get(['id', 'nama_supplier']);
-    }
 }

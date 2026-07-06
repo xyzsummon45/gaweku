@@ -18,21 +18,6 @@
     </label>
 
     <label>
-        <span>Supplier</span>
-        <select name="supplier_id">
-            <option value="">- Tanpa supplier -</option>
-            @foreach ($suppliers as $supplier)
-                <option value="{{ $supplier->id }}" @selected((string) old('supplier_id', $barang->supplier_id) === (string) $supplier->id)>
-                    {{ $supplier->nama_supplier }}
-                </option>
-            @endforeach
-        </select>
-        @error('supplier_id')
-            <small>{{ $message }}</small>
-        @enderror
-    </label>
-
-    <label>
         <span>Harga Beli</span>
         <input type="number" name="harga_beli" value="{{ old('harga_beli', $barang->harga_beli) }}" min="0" step="0.01" required>
         @error('harga_beli')

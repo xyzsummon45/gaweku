@@ -13,8 +13,8 @@ class Supplier extends Model
         'catatan',
     ];
 
-    public function barangs()
+    public function pembelians()
     {
-        return $this->hasMany(Barang::class);
+        return $this->hasMany(Pembelian::class);
     }
 }

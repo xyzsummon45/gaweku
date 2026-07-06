@@ -6,8 +6,7 @@
             <a class="{{ request()->routeIs('supplier.*') ? 'active' : '' }}" href="{{ route('supplier.index') }}">Supplier</a>
             <a class="{{ request()->routeIs('pembelian.*') ? 'active' : '' }}" href="{{ route('pembelian.index') }}">Pembelian</a>
             <a class="{{ request()->routeIs('kas.*') ? 'active' : '' }}" href="{{ route('kas.index') }}">Kas</a>
-            <a class="{{ request()->routeIs('transaksi.index') || request()->routeIs('transaksi.show') ? 'active' : '' }}" href="{{ route('transaksi.index') }}">Riwayat Transaksi</a>
-            <a class="{{ request()->routeIs('transaksi.create') ? 'active' : '' }}" href="{{ route('transaksi.create') }}">Transaksi Baru</a>
+            <a class="{{ request()->routeIs('transaksi.*') ? 'active' : '' }}" href="{{ route('transaksi.index') }}">Transaksi</a>
         </div>
     </div>
 </nav>

@@ -1,6 +1,6 @@
 <nav class="top-nav">
     <div class="top-nav-inner">
-        <a class="brand" href="{{ route('transaksi.create') }}">Jual Beli</a>
+        <a class="brand" href="{{ route('transaksi.create') }}">T.B Global Jaya</a>
         <div class="nav-links">
             <a class="{{ request()->routeIs('barang.*') ? 'active' : '' }}" href="{{ route('barang.index') }}">Barang</a>
             <a class="{{ request()->routeIs('supplier.*') ? 'active' : '' }}" href="{{ route('supplier.index') }}">Supplier</a>

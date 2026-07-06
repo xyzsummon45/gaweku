@@ -30,7 +30,7 @@
             <form class="search-form" method="GET" action="{{ route('barang.index') }}">
                 <label>
                     <span>Cari Barang</span>
-                    <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari kode atau nama barang, contoh: semen">
+                    <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari kode, nama barang, atau supplier">
                 </label>
 
                 <button type="submit">Cari</button>
@@ -56,6 +56,7 @@
                     <tr>
                         <th>Kode</th>
                         <th>Nama Barang</th>
+                        <th>Supplier</th>
                         <th class="number">Harga Beli</th>
                         <th class="number">Harga Jual</th>
                         <th class="number">Stok</th>
@@ -67,6 +68,7 @@
                         <tr>
                             <td>{{ $barang->kode_barang }}</td>
                             <td>{{ $barang->nama_barang }}</td>
+                            <td>{{ $barang->supplier?->nama_supplier ?? '-' }}</td>
                             <td class="number">Rp {{ number_format($barang->harga_beli, 0, ',', '.') }}</td>
                             <td class="number">Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}</td>
                             <td class="number">{{ rtrim(rtrim(number_format($barang->stok, 3, ',', '.'), '0'), ',') }}</td>
@@ -83,7 +85,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td class="empty" colspan="6">Belum ada data barang.</td>
+                            <td class="empty" colspan="7">Belum ada data barang.</td>
                         </tr>
                     @endforelse
                 </tbody>

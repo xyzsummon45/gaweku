@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Barang extends Model
 {
     protected $fillable = [
+        'supplier_id',
         'kode_barang',
         'nama_barang',
         'harga_beli',
@@ -23,5 +24,10 @@ class Barang extends Model
     public function transaksiItems()
     {
         return $this->hasMany(TransaksiItem::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

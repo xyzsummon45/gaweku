@@ -21,4 +21,9 @@ class Transaksi extends Model
     {
         return $this->hasMany(TransaksiItem::class);
     }
+
+    public function kasMutations()
+    {
+        return $this->hasMany(KasMutation::class);
+    }
 }

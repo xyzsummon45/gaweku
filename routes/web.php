@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\KasController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransaksiController;
@@ -15,7 +16,11 @@ Route::resource('barang', BarangController::class)->except('show');
 
 Route::resource('supplier', SupplierController::class)->except('show');
 
+Route::get('/kas', [KasController::class, 'index'])->name('kas.index');
+Route::post('/kas', [KasController::class, 'store'])->name('kas.store');
+
 Route::get('/pembelian/autocomplete-barang', [PembelianController::class, 'autocompleteBarang'])->name('pembelian.autocomplete-barang');
+Route::post('/pembelian/{pembelian}/bayar', [PembelianController::class, 'bayar'])->name('pembelian.bayar');
 Route::resource('pembelian', PembelianController::class)->only(['index', 'create', 'store', 'show']);
 
 Route::get('/transaksi/autocomplete', [TransaksiController::class, 'autocomplete'])->name('transaksi.autocomplete');

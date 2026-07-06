@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\KasAccount;
+use App\Models\KasMutation;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -103,6 +105,18 @@ class TransaksiController extends Controller
             }
 
             $transaksi->update(['total' => $total]);
+
+            $kasBank = KasAccount::where('kode', KasAccount::KAS_BANK)->lockForUpdate()->first() ?? KasAccount::bank();
+            $kasBank->increment('saldo', $total);
+
+            KasMutation::create([
+                'kas_account_id' => $kasBank->id,
+                'transaksi_id' => $transaksi->id,
+                'tanggal' => $transaksi->tanggal,
+                'jenis' => 'pemasukan',
+                'jumlah' => $total,
+                'keterangan' => "Penjualan {$transaksi->kode_transaksi}",
+            ]);
 
             return $transaksi;
         });

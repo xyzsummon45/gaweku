@@ -13,6 +13,7 @@ class Pembelian extends Model
         'tanggal',
         'tanggal_jatuh_tempo',
         'total',
+        'jumlah_dibayar',
         'status_pembayaran',
         'catatan',
     ];
@@ -21,6 +22,7 @@ class Pembelian extends Model
         'tanggal' => 'date',
         'tanggal_jatuh_tempo' => 'date',
         'total' => 'decimal:2',
+        'jumlah_dibayar' => 'decimal:2',
     ];
 
     public function supplier()
@@ -31,5 +33,15 @@ class Pembelian extends Model
     public function items()
     {
         return $this->hasMany(PembelianItem::class);
+    }
+
+    public function kasMutations()
+    {
+        return $this->hasMany(KasMutation::class);
+    }
+
+    public function sisaHutang(): float
+    {
+        return max(0, (float) $this->total - (float) $this->jumlah_dibayar);
     }
 }

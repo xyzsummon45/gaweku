@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Barang;
+use App\Models\KasAccount;
+use App\Models\KasMutation;
 use App\Models\Transaksi;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -51,6 +53,12 @@ class TransaksiTest extends TestCase
             'subtotal' => 10000,
         ]);
         $this->assertSame('9.500', $barang->fresh()->stok);
+        $this->assertSame('10000.00', KasAccount::where('kode', KasAccount::KAS_BANK)->first()->saldo);
+        $this->assertDatabaseHas('kas_mutations', [
+            'transaksi_id' => $transaksi->id,
+            'jenis' => 'pemasukan',
+            'jumlah' => 10000,
+        ]);
     }
 
     public function test_transaction_history_can_be_filtered_by_date(): void

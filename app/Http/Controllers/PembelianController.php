@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\KasAccount;
+use App\Models\KasMutation;
 use App\Models\Pembelian;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class PembelianController extends Controller
 {
@@ -104,6 +107,7 @@ class PembelianController extends Controller
                 'tanggal' => $data['tanggal'],
                 'tanggal_jatuh_tempo' => $data['tanggal_jatuh_tempo'],
                 'total' => 0,
+                'jumlah_dibayar' => 0,
                 'status_pembayaran' => 'belum_lunas',
                 'catatan' => $data['catatan'] ?? null,
             ]);
@@ -153,9 +157,74 @@ class PembelianController extends Controller
 
     public function show(Pembelian $pembelian)
     {
-        $pembelian->load(['supplier', 'items']);
+        $pembelian->load(['supplier', 'items', 'kasMutations.kasAccount']);
 
-        return view('pembelian.show', compact('pembelian'));
+        return view('pembelian.show', [
+            'pembelian' => $pembelian,
+            'kasAccounts' => KasAccount::orderByRaw("CASE kode WHEN 'kas_bank' THEN 1 WHEN 'kas_besar' THEN 2 WHEN 'kas_kecil' THEN 3 ELSE 4 END")->get(),
+        ]);
+    }
+
+    public function bayar(Request $request, Pembelian $pembelian)
+    {
+        $request->merge([
+            'jumlah' => $this->normalizeNumber($request->input('jumlah')),
+        ]);
+
+        $data = $request->validate([
+            'kas_account_id' => ['required', 'integer', 'exists:kas_accounts,id'],
+            'tanggal' => ['required', 'date'],
+            'jumlah' => ['required', 'numeric', 'min:0.01'],
+            'catatan' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        DB::transaction(function () use ($data, $pembelian) {
+            $pembelian = Pembelian::whereKey($pembelian->id)->lockForUpdate()->firstOrFail();
+            $kas = KasAccount::whereKey($data['kas_account_id'])->lockForUpdate()->firstOrFail();
+            $jumlah = (float) $data['jumlah'];
+            $sisaHutang = $pembelian->sisaHutang();
+
+            if ($sisaHutang <= 0) {
+                throw ValidationException::withMessages([
+                    'jumlah' => 'Invoice pembelian ini sudah lunas.',
+                ]);
+            }
+
+            if ($jumlah > $sisaHutang) {
+                throw ValidationException::withMessages([
+                    'jumlah' => 'Jumlah bayar melebihi sisa hutang.',
+                ]);
+            }
+
+            if ((float) $kas->saldo < $jumlah) {
+                throw ValidationException::withMessages([
+                    'jumlah' => 'Saldo kas tidak cukup untuk membayar hutang ini.',
+                ]);
+            }
+
+            $kas->decrement('saldo', $jumlah);
+
+            KasMutation::create([
+                'kas_account_id' => $kas->id,
+                'pembelian_id' => $pembelian->id,
+                'tanggal' => $data['tanggal'],
+                'jenis' => 'pembayaran_hutang',
+                'jumlah' => $jumlah,
+                'keterangan' => $data['catatan'] ?? "Bayar hutang invoice {$pembelian->nomor_invoice}",
+            ]);
+
+            $jumlahDibayar = (float) $pembelian->jumlah_dibayar + $jumlah;
+            $status = $jumlahDibayar >= (float) $pembelian->total ? 'lunas' : 'sebagian';
+
+            $pembelian->update([
+                'jumlah_dibayar' => $jumlahDibayar,
+                'status_pembayaran' => $status,
+            ]);
+        });
+
+        return redirect()
+            ->route('pembelian.show', $pembelian)
+            ->with('success', 'Pembayaran hutang supplier berhasil dicatat.');
     }
 
     public function autocompleteBarang(Request $request)

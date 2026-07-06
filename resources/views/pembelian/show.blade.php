@@ -58,7 +58,7 @@
         @endif
 
         @if ($pembelian->status_pembayaran !== 'lunas')
-            <section class="panel">
+            <section id="bayar-hutang" class="panel">
                 <h2>Bayar Hutang Supplier</h2>
                 <form class="purchase-filter-form" method="POST" action="{{ route('pembelian.bayar', $pembelian) }}">
                     @csrf
@@ -68,7 +68,7 @@
                         <select name="kas_account_id" required>
                             <option value="">Pilih kas</option>
                             @foreach ($kasAccounts as $kas)
-                                <option value="{{ $kas->id }}" @selected((string) old('kas_account_id') === (string) $kas->id)>
+                                <option value="{{ $kas->id }}" @selected((string) old('kas_account_id', $kasAccounts->firstWhere('kode', 'kas_bank')?->id) === (string) $kas->id)>
                                     {{ $kas->nama }} - Rp {{ number_format($kas->saldo, 0, ',', '.') }}
                                 </option>
                             @endforeach

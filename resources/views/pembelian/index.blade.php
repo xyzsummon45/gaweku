@@ -70,6 +70,8 @@
                         <th>Status</th>
                         <th class="number">Item</th>
                         <th class="number">Total</th>
+                        <th class="number">Dibayar</th>
+                        <th class="number">Sisa</th>
                         <th class="number">Aksi</th>
                     </tr>
                 </thead>
@@ -84,13 +86,18 @@
                             <td>{{ str_replace('_', ' ', ucfirst($pembelian->status_pembayaran)) }}</td>
                             <td class="number">{{ $pembelian->items_count }}</td>
                             <td class="number">Rp {{ number_format($pembelian->total, 0, ',', '.') }}</td>
+                            <td class="number">Rp {{ number_format($pembelian->jumlah_dibayar, 0, ',', '.') }}</td>
+                            <td class="number">Rp {{ number_format($pembelian->sisaHutang(), 0, ',', '.') }}</td>
                             <td class="number">
                                 <a class="secondary-button" href="{{ route('pembelian.show', $pembelian) }}">Detail</a>
+                                @if ($pembelian->status_pembayaran !== 'lunas')
+                                    <a class="primary-button" href="{{ route('pembelian.show', $pembelian) }}#bayar-hutang">Bayar</a>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td class="empty" colspan="9">Belum ada data pembelian.</td>
+                            <td class="empty" colspan="11">Belum ada data pembelian.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -143,13 +143,20 @@
         font-weight: 700;
     }
 
-    input {
+    input,
+    textarea {
         width: 100%;
         box-sizing: border-box;
         border: 1px solid #bcccdc;
         border-radius: 6px;
         padding: 10px 12px;
         font-size: 15px;
+        font-family: inherit;
+    }
+
+    textarea {
+        min-height: 94px;
+        resize: vertical;
     }
 
     small {

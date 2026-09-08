@@ -18,6 +18,9 @@
                     {{ $barang->nama_barang }} ({{ $barang->satuan }})
                 </option>
             @endforeach
+            @if ($barangJadis->isEmpty())
+                <option value="" disabled>Belum ada barang dengan jenis Barang Jadi</option>
+            @endif
         </select>
         @error('barang_jadi_id')
             <small>{{ $message }}</small>
@@ -64,7 +67,7 @@
 
 <section class="panel cashier-panel">
     <label>
-        <span>Bahan Baku / Penolong</span>
+        <span>Bahan Baku / Penolong / Dagang</span>
         <select id="bahan-select">
             <option value="">Pilih bahan</option>
             @foreach ($barangBahans as $barang)
@@ -78,6 +81,9 @@
                     {{ $barang->nama_barang }} - {{ $barang->satuan }} - Rp {{ number_format($barang->harga_beli, 0, ',', '.') }}
                 </option>
             @endforeach
+            @if ($barangBahans->isEmpty())
+                <option value="" disabled>Belum ada bahan yang bisa dipilih</option>
+            @endif
         </select>
     </label>
 

@@ -125,4 +125,47 @@ class FormulaTest extends TestCase
             'qty' => ['20'],
         ])->assertSessionHasErrors('barang_jadi_id');
     }
+
+    public function test_formula_can_use_trade_goods_as_material(): void
+    {
+        $tembok = Barang::create([
+            'kode_barang' => 'BJ001',
+            'nama_barang' => 'TEMBOK A',
+            'jenis_barang' => 'barang_jadi',
+            'satuan' => 'm2',
+            'harga_beli' => 0,
+            'harga_jual' => 0,
+            'stok' => 0,
+        ]);
+
+        $pipa = Barang::create([
+            'kode_barang' => 'KAS123',
+            'nama_barang' => 'PIPA PVC 80cm',
+            'jenis_barang' => 'barang_dagang',
+            'satuan' => 'pcs',
+            'harga_beli' => 17000,
+            'harga_jual' => 20000,
+            'stok' => 6,
+        ]);
+
+        $response = $this->post('/formula', [
+            'barang_jadi_id' => $tembok->id,
+            'nama_formula' => 'Formula Tembok A',
+            'qty_hasil' => '1',
+            'margin_persen' => '10',
+            'aktif' => '1',
+            'barang_bahan_id' => [$pipa->id],
+            'qty' => ['2'],
+        ]);
+
+        $formula = Formula::first();
+
+        $response->assertRedirect(route('formula.show', $formula));
+        $this->assertDatabaseHas('formula_items', [
+            'formula_id' => $formula->id,
+            'barang_bahan_id' => $pipa->id,
+            'qty' => 2,
+            'subtotal' => 34000,
+        ]);
+    }
 }

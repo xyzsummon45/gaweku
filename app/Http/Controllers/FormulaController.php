@@ -7,6 +7,7 @@ use App\Models\Formula;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class FormulaController extends Controller
 {
@@ -102,7 +103,7 @@ class FormulaController extends Controller
     {
         return [
             'formula' => $formula,
-            'barangJadis' => Barang::where('jenis_barang', 'barang_jadi')->orderBy('nama_barang')->get(),
+            'barangJadis' => Barang::orderBy('nama_barang')->get(),
             'barangBahans' => Barang::whereIn('jenis_barang', ['bahan_baku', 'bahan_penolong', 'barang_dagang'])->orderBy('nama_barang')->get(),
         ];
     }
@@ -111,21 +112,23 @@ class FormulaController extends Controller
     {
         $request->merge([
             'qty_hasil' => $this->normalizeNumber($request->input('qty_hasil')),
+            'satuan_hasil' => $this->normalizeSatuan($request->input('satuan_hasil')),
             'margin_persen' => $this->normalizeNumber($request->input('margin_persen', 0)),
             'qty' => array_map(fn ($qty) => $this->normalizeNumber($qty), $request->input('qty', [])),
         ]);
 
         $barangJadiRule = Rule::unique('formulas', 'barang_jadi_id')->ignore($formula);
 
-        return $request->validate([
+        $data = $request->validate([
             'barang_jadi_id' => [
                 'required',
                 'integer',
                 $barangJadiRule,
-                Rule::exists('barangs', 'id')->where('jenis_barang', 'barang_jadi'),
+                Rule::exists('barangs', 'id'),
             ],
             'nama_formula' => ['required', 'string', 'max:255'],
             'qty_hasil' => ['required', 'numeric', 'min:0.001'],
+            'satuan_hasil' => ['required', 'string', 'max:30'],
             'margin_persen' => ['required', 'numeric', 'min:0'],
             'aktif' => ['nullable', 'boolean'],
             'catatan' => ['nullable', 'string', 'max:1000'],
@@ -139,6 +142,14 @@ class FormulaController extends Controller
             'qty' => ['required', 'array', 'min:1'],
             'qty.*' => ['required', 'numeric', 'min:0.001'],
         ]);
+
+        if (in_array((int) $data['barang_jadi_id'], array_map('intval', $data['barang_bahan_id']), true)) {
+            throw ValidationException::withMessages([
+                'barang_bahan_id' => 'Produk jadi tidak boleh dipakai sebagai bahan di formula yang sama.',
+            ]);
+        }
+
+        return $data;
     }
 
     private function formulaPayload(array $data): array
@@ -149,6 +160,7 @@ class FormulaController extends Controller
             'barang_jadi_id' => $data['barang_jadi_id'],
             'nama_formula' => $data['nama_formula'],
             'qty_hasil' => $data['qty_hasil'],
+            'satuan_hasil' => $data['satuan_hasil'],
             'total_biaya' => $totals['total_biaya'],
             'hpp' => $totals['hpp'],
             'margin_persen' => $data['margin_persen'],
@@ -160,6 +172,11 @@ class FormulaController extends Controller
 
     private function syncItems(Formula $formula, array $data): void
     {
+        $formula->barangJadi()->update([
+            'jenis_barang' => 'barang_jadi',
+            'satuan' => $data['satuan_hasil'],
+        ]);
+
         $barangs = Barang::whereIn('id', $data['barang_bahan_id'])->get()->keyBy('id');
 
         foreach ($data['barang_bahan_id'] as $index => $barangId) {
@@ -201,5 +218,12 @@ class FormulaController extends Controller
     private function normalizeNumber(mixed $value): string
     {
         return str_replace(',', '.', trim((string) $value));
+    }
+
+    private function normalizeSatuan(mixed $value): string
+    {
+        $value = trim((string) $value);
+
+        return $value !== '' ? $value : 'pcs';
     }
 }

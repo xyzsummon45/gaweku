@@ -32,7 +32,7 @@
             </div>
             <div>
                 <span>Qty Hasil</span>
-                <strong>{{ rtrim(rtrim(number_format($formula->qty_hasil, 3, ',', '.'), '0'), ',') }} {{ $formula->barangJadi->satuan }}</strong>
+                <strong>{{ rtrim(rtrim(number_format($formula->qty_hasil, 3, ',', '.'), '0'), ',') }} {{ $formula->satuan_hasil }}</strong>
             </div>
             <div>
                 <span>Status</span>
@@ -43,7 +43,7 @@
                 <strong>Rp {{ number_format($formula->total_biaya, 0, ',', '.') }}</strong>
             </div>
             <div>
-                <span>HPP per {{ $formula->barangJadi->satuan }}</span>
+                <span>HPP per {{ $formula->satuan_hasil }}</span>
                 <strong>Rp {{ number_format($formula->hpp, 0, ',', '.') }}</strong>
             </div>
             <div>

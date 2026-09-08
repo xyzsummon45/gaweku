@@ -10,6 +10,7 @@ class Formula extends Model
         'barang_jadi_id',
         'nama_formula',
         'qty_hasil',
+        'satuan_hasil',
         'total_biaya',
         'hpp',
         'margin_persen',

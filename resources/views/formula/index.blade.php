@@ -58,7 +58,7 @@
                         <tr>
                             <td>{{ $formula->nama_formula }}</td>
                             <td>{{ $formula->barangJadi->nama_barang }}</td>
-                            <td class="number">{{ rtrim(rtrim(number_format($formula->qty_hasil, 3, ',', '.'), '0'), ',') }} {{ $formula->barangJadi->satuan }}</td>
+                            <td class="number">{{ rtrim(rtrim(number_format($formula->qty_hasil, 3, ',', '.'), '0'), ',') }} {{ $formula->satuan_hasil }}</td>
                             <td class="number">{{ $formula->items_count }}</td>
                             <td class="number">Rp {{ number_format($formula->hpp, 0, ',', '.') }}</td>
                             <td class="number">{{ rtrim(rtrim(number_format($formula->margin_persen, 2, ',', '.'), '0'), ',') }}%</td>

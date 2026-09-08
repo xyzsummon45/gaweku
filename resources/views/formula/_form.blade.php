@@ -6,26 +6,25 @@
 
 @if ($barangJadis->isEmpty())
     <div class="alert alert-info">
-        Belum ada produk jadi. Buat barang dulu dengan jenis Barang Jadi, misalnya Tembok 1 m2.
+        Belum ada barang. Buat barang dulu di menu Barang, lalu kembali ke formula.
     </div>
 @endif
 
 <section class="panel form-grid">
     <label>
-        <span>Produk Jadi yang Dibuat</span>
+        <span>Produk yang Dibuat</span>
         <select name="barang_jadi_id" id="barang-jadi" required>
-            <option value="">Pilih barang jadi</option>
+            <option value="">Pilih produk</option>
             @foreach ($barangJadis as $barang)
                 <option
                     value="{{ $barang->id }}"
-                    data-satuan="{{ $barang->satuan }}"
                     @selected((string) old('barang_jadi_id', $formula->barang_jadi_id) === (string) $barang->id)
                 >
-                    {{ $barang->nama_barang }} ({{ $barang->satuan }})
+                    {{ $barang->nama_barang }}
                 </option>
             @endforeach
             @if ($barangJadis->isEmpty())
-                <option value="" disabled>Belum ada barang dengan jenis Barang Jadi</option>
+                <option value="" disabled>Belum ada barang</option>
             @endif
         </select>
         @error('barang_jadi_id')
@@ -44,7 +43,7 @@
     <label>
         <span>Jumlah Hasil</span>
         <input id="qty-hasil" type="text" inputmode="decimal" name="qty_hasil" value="{{ old('qty_hasil', $formula->qty_hasil ?: 1) }}" placeholder="Isi angka saja, contoh: 1" required>
-        <span class="hint">Kalau hasilnya 1 m2, isi 1 di sini. Satuan m2 diambil dari produk jadi.</span>
+        <span class="hint">Kalau hasilnya 1 m2, isi 1 di sini.</span>
         @error('qty_hasil')
             <small>{{ $message }}</small>
         @enderror
@@ -52,7 +51,21 @@
 
     <label>
         <span>Satuan Hasil</span>
-        <input id="satuan-hasil" type="text" value="Pilih produk jadi dulu" disabled>
+        <input id="satuan-hasil" type="text" name="satuan_hasil" list="satuan-options" value="{{ old('satuan_hasil', $formula->satuan_hasil ?: 'pcs') }}" placeholder="Pilih atau ketik satuan" required>
+        <datalist id="satuan-options">
+            <option value="pcs"></option>
+            <option value="kg"></option>
+            <option value="gram"></option>
+            <option value="sak"></option>
+            <option value="m"></option>
+            <option value="m2"></option>
+            <option value="m3"></option>
+            <option value="liter"></option>
+            <option value="unit"></option>
+        </datalist>
+        @error('satuan_hasil')
+            <small>{{ $message }}</small>
+        @enderror
     </label>
 
     <label>
@@ -155,7 +168,6 @@
 
 <script>
     const bahanSelect = document.getElementById('bahan-select');
-    const barangJadiSelect = document.getElementById('barang-jadi');
     const qtyBahanInput = document.getElementById('qty-bahan');
     const qtyHasilInput = document.getElementById('qty-hasil');
     const satuanHasilInput = document.getElementById('satuan-hasil');
@@ -189,7 +201,7 @@
     });
 
     addBahanButton.addEventListener('click', addBahan);
-    barangJadiSelect.addEventListener('change', syncSatuanHasil);
+    satuanHasilInput.addEventListener('input', renderFormula);
     qtyHasilInput.addEventListener('input', renderFormula);
     marginInput.addEventListener('input', renderFormula);
 
@@ -216,7 +228,6 @@
         });
     });
 
-    syncSatuanHasil();
     renderFormula();
 
     function addBahan() {
@@ -305,21 +316,10 @@
         return Number.parseFloat(String(value).replace(',', '.'));
     }
 
-    function syncSatuanHasil() {
-        satuanHasilInput.value = selectedSatuanHasilForInput();
-        renderFormula();
-    }
-
-    function selectedSatuanHasilForInput() {
-        const option = barangJadiSelect.selectedOptions[0];
-
-        return option?.dataset.satuan || 'Pilih produk jadi dulu';
-    }
-
     function selectedSatuanHasilForLabel() {
-        const option = barangJadiSelect.selectedOptions[0];
+        const satuan = satuanHasilInput.value.trim();
 
-        return option?.dataset.satuan || 'satuan';
+        return satuan || 'satuan';
     }
 
     function formatQty(value) {

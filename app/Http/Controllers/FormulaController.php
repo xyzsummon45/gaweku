@@ -7,7 +7,6 @@ use App\Models\Formula;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 
 class FormulaController extends Controller
 {
@@ -23,11 +22,7 @@ class FormulaController extends Controller
             ->withCount('items')
             ->when($keyword !== '', function ($query) use ($keyword) {
                 $query->where(function ($query) use ($keyword) {
-                    $query->where('nama_formula', 'like', "%{$keyword}%")
-                        ->orWhereHas('barangJadi', function ($query) use ($keyword) {
-                            $query->where('kode_barang', 'like', "%{$keyword}%")
-                                ->orWhere('nama_barang', 'like', "%{$keyword}%");
-                        });
+                    $query->where('nama_formula', 'like', "%{$keyword}%");
                 });
             })
             ->orderBy('nama_formula')
@@ -103,7 +98,6 @@ class FormulaController extends Controller
     {
         return [
             'formula' => $formula,
-            'barangJadis' => Barang::orderBy('nama_barang')->get(),
             'barangBahans' => Barang::whereIn('jenis_barang', ['bahan_baku', 'bahan_penolong', 'barang_dagang'])->orderBy('nama_barang')->get(),
         ];
     }
@@ -117,15 +111,7 @@ class FormulaController extends Controller
             'qty' => array_map(fn ($qty) => $this->normalizeNumber($qty), $request->input('qty', [])),
         ]);
 
-        $barangJadiRule = Rule::unique('formulas', 'barang_jadi_id')->ignore($formula);
-
         $data = $request->validate([
-            'barang_jadi_id' => [
-                'required',
-                'integer',
-                $barangJadiRule,
-                Rule::exists('barangs', 'id'),
-            ],
             'nama_formula' => ['required', 'string', 'max:255'],
             'qty_hasil' => ['required', 'numeric', 'min:0.001'],
             'satuan_hasil' => ['required', 'string', 'max:30'],
@@ -143,12 +129,6 @@ class FormulaController extends Controller
             'qty.*' => ['required', 'numeric', 'min:0.001'],
         ]);
 
-        if (in_array((int) $data['barang_jadi_id'], array_map('intval', $data['barang_bahan_id']), true)) {
-            throw ValidationException::withMessages([
-                'barang_bahan_id' => 'Produk jadi tidak boleh dipakai sebagai bahan di formula yang sama.',
-            ]);
-        }
-
         return $data;
     }
 
@@ -157,7 +137,6 @@ class FormulaController extends Controller
         $totals = $this->calculateTotals($data);
 
         return [
-            'barang_jadi_id' => $data['barang_jadi_id'],
             'nama_formula' => $data['nama_formula'],
             'qty_hasil' => $data['qty_hasil'],
             'satuan_hasil' => $data['satuan_hasil'],
@@ -172,11 +151,6 @@ class FormulaController extends Controller
 
     private function syncItems(Formula $formula, array $data): void
     {
-        $formula->barangJadi()->update([
-            'jenis_barang' => 'barang_jadi',
-            'satuan' => $data['satuan_hasil'],
-        ]);
-
         $barangs = Barang::whereIn('id', $data['barang_bahan_id'])->get()->keyBy('id');
 
         foreach ($data['barang_bahan_id'] as $index => $barangId) {

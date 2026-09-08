@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('formulas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('barang_jadi_id')->unique()->constrained('barangs')->restrictOnDelete();
+            $table->foreignId('barang_jadi_id')->nullable()->constrained('barangs')->nullOnDelete();
             $table->string('nama_formula');
             $table->decimal('qty_hasil', 15, 3)->default(1);
             $table->decimal('total_biaya', 15, 2)->default(0);

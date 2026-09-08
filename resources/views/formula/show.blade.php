@@ -12,7 +12,7 @@
     <main class="page">
         <header class="page-header">
             <div>
-                <p>{{ $formula->barangJadi->nama_barang }}</p>
+                <p>Master Produksi</p>
                 <h1>{{ $formula->nama_formula }}</h1>
             </div>
             <div class="header-actions">
@@ -26,10 +26,6 @@
         @endif
 
         <section class="panel summary-grid">
-            <div>
-                <span>Produk Jadi</span>
-                <strong>{{ $formula->barangJadi->nama_barang }}</strong>
-            </div>
             <div>
                 <span>Qty Hasil</span>
                 <strong>{{ rtrim(rtrim(number_format($formula->qty_hasil, 3, ',', '.'), '0'), ',') }} {{ $formula->satuan_hasil }}</strong>

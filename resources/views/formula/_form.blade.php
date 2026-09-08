@@ -4,34 +4,7 @@
     <div class="alert alert-error">{{ $errors->first() }}</div>
 @endif
 
-@if ($barangJadis->isEmpty())
-    <div class="alert alert-info">
-        Belum ada barang. Buat barang dulu di menu Barang, lalu kembali ke formula.
-    </div>
-@endif
-
 <section class="panel form-grid">
-    <label>
-        <span>Produk yang Dibuat</span>
-        <select name="barang_jadi_id" id="barang-jadi" required>
-            <option value="">Pilih produk</option>
-            @foreach ($barangJadis as $barang)
-                <option
-                    value="{{ $barang->id }}"
-                    @selected((string) old('barang_jadi_id', $formula->barang_jadi_id) === (string) $barang->id)
-                >
-                    {{ $barang->nama_barang }}
-                </option>
-            @endforeach
-            @if ($barangJadis->isEmpty())
-                <option value="" disabled>Belum ada barang</option>
-            @endif
-        </select>
-        @error('barang_jadi_id')
-            <small>{{ $message }}</small>
-        @enderror
-    </label>
-
     <label>
         <span>Nama Formula</span>
         <input type="text" name="nama_formula" value="{{ old('nama_formula', $formula->nama_formula) }}" placeholder="Contoh: Formula Tembok 1 m2" required>
@@ -115,7 +88,6 @@
     <label>
         <span>Jumlah Bahan</span>
         <input id="qty-bahan" type="text" inputmode="decimal" value="1" placeholder="Isi angka saja, contoh: 10">
-        <span class="hint">Jumlah bahan untuk menghasilkan qty hasil di atas.</span>
     </label>
 
     <button id="add-bahan" type="button">Tambah Bahan</button>

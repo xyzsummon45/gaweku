@@ -11,18 +11,8 @@ class FormulaTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_formula_can_be_created_for_finished_goods(): void
+    public function test_formula_can_be_created(): void
     {
-        $tembok = Barang::create([
-            'kode_barang' => 'BJ001',
-            'nama_barang' => 'TEMBOK A',
-            'jenis_barang' => 'barang_jadi',
-            'satuan' => 'm2',
-            'harga_beli' => 0,
-            'harga_jual' => 0,
-            'stok' => 0,
-        ]);
-
         $bata = Barang::create([
             'kode_barang' => 'BB001',
             'nama_barang' => 'BATA MERAH',
@@ -44,7 +34,6 @@ class FormulaTest extends TestCase
         ]);
 
         $response = $this->post('/formula', [
-            'barang_jadi_id' => $tembok->id,
             'nama_formula' => 'Formula Tembok A',
             'qty_hasil' => '1',
             'satuan_hasil' => 'm2',
@@ -59,7 +48,6 @@ class FormulaTest extends TestCase
         $response->assertRedirect(route('formula.show', $formula));
         $this->assertDatabaseHas('formulas', [
             'id' => $formula->id,
-            'barang_jadi_id' => $tembok->id,
             'nama_formula' => 'Formula Tembok A',
             'total_biaya' => 30000,
             'satuan_hasil' => 'm2',
@@ -84,18 +72,8 @@ class FormulaTest extends TestCase
         ]);
     }
 
-    public function test_one_finished_good_can_only_have_one_formula(): void
+    public function test_formula_can_be_updated(): void
     {
-        $tembok = Barang::create([
-            'kode_barang' => 'BJ001',
-            'nama_barang' => 'TEMBOK A',
-            'jenis_barang' => 'barang_jadi',
-            'satuan' => 'm2',
-            'harga_beli' => 0,
-            'harga_jual' => 0,
-            'stok' => 0,
-        ]);
-
         $bata = Barang::create([
             'kode_barang' => 'BB001',
             'nama_barang' => 'BATA MERAH',
@@ -106,8 +84,7 @@ class FormulaTest extends TestCase
             'stok' => 100,
         ]);
 
-        Formula::create([
-            'barang_jadi_id' => $tembok->id,
+        $formula = Formula::create([
             'nama_formula' => 'Formula Lama',
             'qty_hasil' => 1,
             'satuan_hasil' => 'm2',
@@ -118,30 +95,29 @@ class FormulaTest extends TestCase
             'aktif' => true,
         ]);
 
-        $this->post('/formula', [
-            'barang_jadi_id' => $tembok->id,
+        $this->put(route('formula.update', $formula), [
             'nama_formula' => 'Formula Baru',
-            'qty_hasil' => '1',
+            'qty_hasil' => '2',
             'satuan_hasil' => 'm2',
-            'margin_persen' => '0',
+            'margin_persen' => '10',
             'aktif' => '1',
             'barang_bahan_id' => [$bata->id],
             'qty' => ['20'],
-        ])->assertSessionHasErrors('barang_jadi_id');
+        ])->assertRedirect(route('formula.show', $formula));
+
+        $this->assertDatabaseHas('formulas', [
+            'id' => $formula->id,
+            'nama_formula' => 'Formula Baru',
+            'qty_hasil' => 2,
+            'satuan_hasil' => 'm2',
+            'total_biaya' => 10000,
+            'hpp' => 5000,
+            'harga_jual_rekomendasi' => 5500,
+        ]);
     }
 
     public function test_formula_can_use_trade_goods_as_material(): void
     {
-        $tembok = Barang::create([
-            'kode_barang' => 'BJ001',
-            'nama_barang' => 'TEMBOK A',
-            'jenis_barang' => 'barang_jadi',
-            'satuan' => 'm2',
-            'harga_beli' => 0,
-            'harga_jual' => 0,
-            'stok' => 0,
-        ]);
-
         $pipa = Barang::create([
             'kode_barang' => 'KAS123',
             'nama_barang' => 'PIPA PVC 80cm',
@@ -153,7 +129,6 @@ class FormulaTest extends TestCase
         ]);
 
         $response = $this->post('/formula', [
-            'barang_jadi_id' => $tembok->id,
             'nama_formula' => 'Formula Tembok A',
             'qty_hasil' => '1',
             'satuan_hasil' => 'm2',
@@ -172,44 +147,5 @@ class FormulaTest extends TestCase
             'qty' => 2,
             'subtotal' => 34000,
         ]);
-    }
-
-    public function test_formula_marks_selected_product_as_finished_good(): void
-    {
-        $produk = Barang::create([
-            'kode_barang' => 'BJ001',
-            'nama_barang' => 'TEMBOK A',
-            'jenis_barang' => 'barang_dagang',
-            'satuan' => 'pcs',
-            'harga_beli' => 0,
-            'harga_jual' => 0,
-            'stok' => 0,
-        ]);
-
-        $bata = Barang::create([
-            'kode_barang' => 'BB001',
-            'nama_barang' => 'BATA MERAH',
-            'jenis_barang' => 'barang_dagang',
-            'satuan' => 'pcs',
-            'harga_beli' => 500,
-            'harga_jual' => 1000,
-            'stok' => 100,
-        ]);
-
-        $this->post('/formula', [
-            'barang_jadi_id' => $produk->id,
-            'nama_formula' => 'Formula Tembok A',
-            'qty_hasil' => '1',
-            'satuan_hasil' => 'm2',
-            'margin_persen' => '0',
-            'aktif' => '1',
-            'barang_bahan_id' => [$bata->id],
-            'qty' => ['20'],
-        ])->assertRedirect();
-
-        $produk->refresh();
-
-        $this->assertSame('barang_jadi', $produk->jenis_barang);
-        $this->assertSame('m2', $produk->satuan);
     }
 }

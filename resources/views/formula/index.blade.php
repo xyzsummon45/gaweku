@@ -30,7 +30,7 @@
             <form class="search-form" method="GET" action="{{ route('formula.index') }}">
                 <label>
                     <span>Cari Formula</span>
-                    <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari nama formula atau produk jadi">
+                    <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari nama formula">
                 </label>
 
                 <button type="submit">Cari</button>
@@ -43,7 +43,6 @@
                 <thead>
                     <tr>
                         <th>Formula</th>
-                        <th>Produk Jadi</th>
                         <th class="number">Hasil</th>
                         <th class="number">Bahan</th>
                         <th class="number">HPP</th>
@@ -57,7 +56,6 @@
                     @forelse ($formulas as $formula)
                         <tr>
                             <td>{{ $formula->nama_formula }}</td>
-                            <td>{{ $formula->barangJadi->nama_barang }}</td>
                             <td class="number">{{ rtrim(rtrim(number_format($formula->qty_hasil, 3, ',', '.'), '0'), ',') }} {{ $formula->satuan_hasil }}</td>
                             <td class="number">{{ $formula->items_count }}</td>
                             <td class="number">Rp {{ number_format($formula->hpp, 0, ',', '.') }}</td>
@@ -78,7 +76,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td class="empty" colspan="9">Belum ada data formula.</td>
+                            <td class="empty" colspan="8">Belum ada data formula.</td>
                         </tr>
                     @endforelse
                 </tbody>

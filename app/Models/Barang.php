@@ -31,4 +31,14 @@ class Barang extends Model
     {
         return $this->hasMany(PembelianItem::class);
     }
+
+    public function formulaProdukJadi()
+    {
+        return $this->hasOne(Formula::class, 'barang_jadi_id');
+    }
+
+    public function formulaItemsBahan()
+    {
+        return $this->hasMany(FormulaItem::class, 'barang_bahan_id');
+    }
 }

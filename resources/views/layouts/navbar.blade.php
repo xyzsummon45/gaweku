@@ -3,6 +3,7 @@
         <a class="brand" href="{{ route('transaksi.create') }}">T.B Global Jaya</a>
         <div class="nav-links">
             <a class="{{ request()->routeIs('barang.*') ? 'active' : '' }}" href="{{ route('barang.index') }}">Barang</a>
+            <a class="{{ request()->routeIs('formula.*') ? 'active' : '' }}" href="{{ route('formula.index') }}">Formula</a>
             <a class="{{ request()->routeIs('supplier.*') ? 'active' : '' }}" href="{{ route('supplier.index') }}">Supplier</a>
             <a class="{{ request()->routeIs('pembelian.*') ? 'active' : '' }}" href="{{ route('pembelian.index') }}">Pembelian</a>
             <a class="{{ request()->routeIs('kas.*') ? 'active' : '' }}" href="{{ route('kas.index') }}">Kas</a>

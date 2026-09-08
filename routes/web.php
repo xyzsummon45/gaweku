@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\FormulaController;
 use App\Http\Controllers\KasController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\SupplierController;
@@ -13,6 +14,8 @@ Route::get('/', function () {
 
 Route::post('/barang/import', [BarangController::class, 'import'])->name('barang.import');
 Route::resource('barang', BarangController::class)->except('show');
+
+Route::resource('formula', FormulaController::class);
 
 Route::resource('supplier', SupplierController::class)->except('show');
 

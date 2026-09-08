@@ -4,9 +4,15 @@
     <div class="alert alert-error">{{ $errors->first() }}</div>
 @endif
 
+@if ($barangJadis->isEmpty())
+    <div class="alert alert-info">
+        Belum ada produk jadi. Buat barang dulu dengan jenis Barang Jadi, misalnya Tembok 1 m2.
+    </div>
+@endif
+
 <section class="panel form-grid">
     <label>
-        <span>Produk Jadi</span>
+        <span>Produk Jadi yang Dibuat</span>
         <select name="barang_jadi_id" id="barang-jadi" required>
             <option value="">Pilih barang jadi</option>
             @foreach ($barangJadis as $barang)
@@ -36,8 +42,9 @@
     </label>
 
     <label>
-        <span>Formula Ini Menghasilkan</span>
-        <input id="qty-hasil" type="text" inputmode="decimal" name="qty_hasil" value="{{ old('qty_hasil', $formula->qty_hasil ?: 1) }}" required>
+        <span>Jumlah Hasil</span>
+        <input id="qty-hasil" type="text" inputmode="decimal" name="qty_hasil" value="{{ old('qty_hasil', $formula->qty_hasil ?: 1) }}" placeholder="Isi angka saja, contoh: 1" required>
+        <span class="hint">Kalau hasilnya 1 m2, isi 1 di sini. Satuan m2 diambil dari produk jadi.</span>
         @error('qty_hasil')
             <small>{{ $message }}</small>
         @enderror
@@ -45,7 +52,7 @@
 
     <label>
         <span>Satuan Hasil</span>
-        <input id="satuan-hasil" type="text" value="-" disabled>
+        <input id="satuan-hasil" type="text" value="Pilih produk jadi dulu" disabled>
     </label>
 
     <label>
@@ -93,8 +100,9 @@
     </label>
 
     <label>
-        <span>Kebutuhan Bahan untuk Hasil Ini</span>
-        <input id="qty-bahan" type="text" inputmode="decimal" value="1">
+        <span>Jumlah Bahan</span>
+        <input id="qty-bahan" type="text" inputmode="decimal" value="1" placeholder="Isi angka saja, contoh: 10">
+        <span class="hint">Jumlah bahan untuk menghasilkan qty hasil di atas.</span>
     </label>
 
     <button id="add-bahan" type="button">Tambah Bahan</button>
@@ -276,7 +284,7 @@
 
         const qtyHasil = parseDecimal(qtyHasilInput.value);
         const margin = parseDecimal(marginInput.value);
-        const satuanHasil = selectedSatuanHasil();
+        const satuanHasil = selectedSatuanHasilForLabel();
         const hppValue = Number.isFinite(qtyHasil) && qtyHasil > 0 ? total / qtyHasil : 0;
         const rekomendasi = hppValue + (hppValue * ((Number.isFinite(margin) ? margin : 0) / 100));
 
@@ -298,11 +306,17 @@
     }
 
     function syncSatuanHasil() {
-        satuanHasilInput.value = selectedSatuanHasil();
+        satuanHasilInput.value = selectedSatuanHasilForInput();
         renderFormula();
     }
 
-    function selectedSatuanHasil() {
+    function selectedSatuanHasilForInput() {
+        const option = barangJadiSelect.selectedOptions[0];
+
+        return option?.dataset.satuan || 'Pilih produk jadi dulu';
+    }
+
+    function selectedSatuanHasilForLabel() {
         const option = barangJadiSelect.selectedOptions[0];
 
         return option?.dataset.satuan || 'satuan';

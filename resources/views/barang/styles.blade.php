@@ -296,6 +296,18 @@
         color: #991b1b;
     }
 
+    .alert-info {
+        background: #e0f2fe;
+        color: #075985;
+    }
+
+    .hint {
+        color: #64748b;
+        display: block;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
     table {
         width: 100%;
         border-collapse: collapse;

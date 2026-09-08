@@ -16,12 +16,16 @@ class BarangController extends Controller
         ]);
 
         $keyword = trim($filters['q'] ?? '');
+        $normalizedKeyword = str_replace([' ', '-'], '_', strtolower($keyword));
 
         $barangs = Barang::query()
-            ->when($keyword !== '', function ($query) use ($keyword) {
-                $query->where(function ($query) use ($keyword) {
+            ->when($keyword !== '', function ($query) use ($keyword, $normalizedKeyword) {
+                $query->where(function ($query) use ($keyword, $normalizedKeyword) {
                     $query->where('kode_barang', 'like', "%{$keyword}%")
-                        ->orWhere('nama_barang', 'like', "%{$keyword}%");
+                        ->orWhere('nama_barang', 'like', "%{$keyword}%")
+                        ->orWhere('jenis_barang', 'like', "%{$keyword}%")
+                        ->orWhere('jenis_barang', 'like', "%{$normalizedKeyword}%")
+                        ->orWhere('satuan', 'like', "%{$keyword}%");
                 });
             })
             ->orderBy('nama_barang')
@@ -121,6 +125,8 @@ class BarangController extends Controller
             $data = [
                 'kode_barang' => trim((string) $row[$columns['kode_barang']]),
                 'nama_barang' => trim((string) $row[$columns['nama_barang']]),
+                'jenis_barang' => $this->normalizeJenisBarang($row[$columns['jenis_barang'] ?? null] ?? 'barang_dagang'),
+                'satuan' => $this->normalizeSatuan($row[$columns['satuan'] ?? null] ?? 'pcs'),
                 'harga_beli' => $this->normalizeNumber($row[$columns['harga_beli']]),
                 'harga_jual' => $this->normalizeNumber($row[$columns['harga_jual']]),
                 'stok' => $this->normalizeNumber($row[$columns['stok']]),
@@ -174,6 +180,8 @@ class BarangController extends Controller
         return [
             'kode_barang' => $codeRules,
             'nama_barang' => ['required', 'string', 'max:255'],
+            'jenis_barang' => ['required', 'string', 'in:bahan_baku,barang_jadi,barang_dagang,bahan_penolong'],
+            'satuan' => ['required', 'string', 'max:30'],
             'harga_beli' => ['required', 'numeric', 'min:0'],
             'harga_jual' => ['required', 'numeric', 'min:0'],
             'stok' => ['required', 'numeric', 'min:0'],
@@ -185,4 +193,20 @@ class BarangController extends Controller
         return str_replace(',', '.', trim((string) $value));
     }
 
+    private function normalizeJenisBarang(mixed $value): string
+    {
+        $value = strtolower(trim((string) $value));
+        $value = str_replace([' ', '-'], '_', $value);
+
+        return in_array($value, ['bahan_baku', 'barang_jadi', 'barang_dagang', 'bahan_penolong'], true)
+            ? $value
+            : 'barang_dagang';
+    }
+
+    private function normalizeSatuan(mixed $value): string
+    {
+        $value = trim((string) $value);
+
+        return $value !== '' ? $value : 'pcs';
+    }
 }

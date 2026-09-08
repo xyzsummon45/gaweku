@@ -30,7 +30,7 @@
             <form class="search-form" method="GET" action="{{ route('barang.index') }}">
                 <label>
                     <span>Cari Barang</span>
-                    <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari kode atau nama barang, contoh: semen">
+                    <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari kode, nama, jenis, atau satuan">
                 </label>
 
                 <button type="submit">Cari</button>
@@ -41,7 +41,7 @@
         <section class="panel toolbar">
             <div>
                 <strong>Import Excel</strong>
-                <p>Gunakan header: kode_barang, nama_barang, harga_beli, harga_jual, stok.</p>
+                <p>Header wajib: kode_barang, nama_barang, harga_beli, harga_jual, stok. Opsional: jenis_barang, satuan.</p>
             </div>
             <form class="import-form" method="POST" action="{{ route('barang.import') }}" enctype="multipart/form-data">
                 @csrf
@@ -56,6 +56,8 @@
                     <tr>
                         <th>Kode</th>
                         <th>Nama Barang</th>
+                        <th>Jenis</th>
+                        <th>Satuan</th>
                         <th class="number">Harga Beli</th>
                         <th class="number">Harga Jual</th>
                         <th class="number">Stok</th>
@@ -67,6 +69,8 @@
                         <tr>
                             <td>{{ $barang->kode_barang }}</td>
                             <td>{{ $barang->nama_barang }}</td>
+                            <td>{{ ucwords(str_replace('_', ' ', $barang->jenis_barang)) }}</td>
+                            <td>{{ $barang->satuan }}</td>
                             <td class="number">Rp {{ number_format($barang->harga_beli, 0, ',', '.') }}</td>
                             <td class="number">Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}</td>
                             <td class="number">{{ rtrim(rtrim(number_format($barang->stok, 3, ',', '.'), '0'), ',') }}</td>
@@ -83,7 +87,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td class="empty" colspan="6">Belum ada data barang.</td>
+                            <td class="empty" colspan="8">Belum ada data barang.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -15,6 +15,8 @@ class BarangTest extends TestCase
         Barang::create([
             'kode_barang' => 'AAA11',
             'nama_barang' => 'SEMEN PUTIH',
+            'jenis_barang' => 'bahan_baku',
+            'satuan' => 'kg',
             'harga_beli' => 20000,
             'harga_jual' => 30000,
             'stok' => 24.3,
@@ -23,6 +25,8 @@ class BarangTest extends TestCase
         Barang::create([
             'kode_barang' => 'KAS123',
             'nama_barang' => 'PIPA PVC 80cm',
+            'jenis_barang' => 'barang_dagang',
+            'satuan' => 'pcs',
             'harga_beli' => 17000,
             'harga_jual' => 20000,
             'stok' => 6,
@@ -31,6 +35,8 @@ class BarangTest extends TestCase
         $this->get('/barang?q=semen')
             ->assertOk()
             ->assertSee('SEMEN PUTIH')
+            ->assertSee('Bahan Baku')
+            ->assertSee('kg')
             ->assertSee('24,3')
             ->assertDontSee('PIPA PVC 80cm');
 
@@ -45,6 +51,8 @@ class BarangTest extends TestCase
         $this->post('/barang', [
             'kode_barang' => 'NON001',
             'nama_barang' => 'Barang Baru',
+            'jenis_barang' => 'barang_jadi',
+            'satuan' => 'm2',
             'harga_beli' => 1000,
             'harga_jual' => 1500,
             'stok' => 2,
@@ -53,6 +61,8 @@ class BarangTest extends TestCase
         $this->assertDatabaseHas('barangs', [
             'kode_barang' => 'NON001',
             'nama_barang' => 'Barang Baru',
+            'jenis_barang' => 'barang_jadi',
+            'satuan' => 'm2',
         ]);
     }
 }

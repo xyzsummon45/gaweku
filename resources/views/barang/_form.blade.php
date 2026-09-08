@@ -18,6 +18,31 @@
     </label>
 
     <label>
+        <span>Jenis Barang</span>
+        <select name="jenis_barang" required>
+            @foreach ([
+                'bahan_baku' => 'Bahan Baku',
+                'barang_jadi' => 'Barang Jadi',
+                'barang_dagang' => 'Barang Dagang',
+                'bahan_penolong' => 'Bahan Penolong',
+            ] as $value => $label)
+                <option value="{{ $value }}" @selected(old('jenis_barang', $barang->jenis_barang ?: 'barang_dagang') === $value)>{{ $label }}</option>
+            @endforeach
+        </select>
+        @error('jenis_barang')
+            <small>{{ $message }}</small>
+        @enderror
+    </label>
+
+    <label>
+        <span>Satuan</span>
+        <input type="text" name="satuan" value="{{ old('satuan', $barang->satuan ?: 'pcs') }}" placeholder="pcs, kg, sak, m2" required>
+        @error('satuan')
+            <small>{{ $message }}</small>
+        @enderror
+    </label>
+
+    <label>
         <span>Harga Beli</span>
         <input type="number" name="harga_beli" value="{{ old('harga_beli', $barang->harga_beli) }}" min="0" step="0.01" required>
         @error('harga_beli')

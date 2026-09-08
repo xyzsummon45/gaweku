@@ -20,7 +20,7 @@
         <section class="panel">
             <form method="POST" action="{{ route('barang.update', $barang) }}">
                 @method('PUT')
-                @include('barang._form', ['submit' => 'Update Barang'])
+                @include('barang._form', ['submit' => 'Update Barang', 'isEdit' => true])
             </form>
         </section>
     </main>

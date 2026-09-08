@@ -51,4 +51,9 @@ class Barang extends Model
     {
         return $this->hasMany(ProduksiItem::class, 'barang_bahan_id');
     }
+
+    public function stokMutasis()
+    {
+        return $this->hasMany(StokMutasi::class);
+    }
 }

@@ -65,7 +65,7 @@ class BarangController extends Controller
 
     public function update(Request $request, Barang $barang)
     {
-        $barang->update($this->validatedData($request, $barang));
+        $barang->update($this->validatedData($request, $barang, false));
 
         return redirect()
             ->route('barang.index')
@@ -163,16 +163,16 @@ class BarangController extends Controller
             ->with('success', "{$imported} barang berhasil diimport.");
     }
 
-    private function validatedData(Request $request, ?Barang $barang = null): array
+    private function validatedData(Request $request, ?Barang $barang = null, bool $includeStock = true): array
     {
-        $this->prepareManufacturedItemDefaults($request);
+        $this->prepareManufacturedItemDefaults($request, $includeStock);
 
-        $data = $request->validate($this->rules($barang));
+        $data = $request->validate($this->rules($barang, includeStock: $includeStock));
 
         return $data;
     }
 
-    private function rules(?Barang $barang = null, bool $allowExistingCode = false): array
+    private function rules(?Barang $barang = null, bool $allowExistingCode = false, bool $includeStock = true): array
     {
         $codeRules = ['required', 'string', 'max:50'];
 
@@ -180,33 +180,44 @@ class BarangController extends Controller
             $codeRules[] = Rule::unique('barangs', 'kode_barang')->ignore($barang);
         }
 
-        return [
+        $rules = [
             'kode_barang' => $codeRules,
             'nama_barang' => ['required', 'string', 'max:255'],
             'jenis_barang' => ['required', 'string', 'in:bahan_baku,barang_jadi,barang_dagang,bahan_penolong'],
             'satuan' => ['required', 'string', 'max:30'],
             'harga_beli' => ['required', 'numeric', 'min:0'],
             'harga_jual' => ['required', 'numeric', 'min:0'],
-            'stok' => ['required', 'numeric', 'min:0'],
         ];
+
+        if ($includeStock) {
+            $rules['stok'] = ['required', 'numeric', 'min:0'];
+        }
+
+        return $rules;
     }
 
-    private function prepareManufacturedItemDefaults(Request $request): void
+    private function prepareManufacturedItemDefaults(Request $request, bool $includeStock): void
     {
         if ($request->input('jenis_barang') !== 'barang_jadi') {
             return;
         }
 
-        $request->merge($this->withManufacturedItemDefaults($request->all()));
+        $request->merge($this->withManufacturedItemDefaults($request->all(), $includeStock));
     }
 
-    private function withManufacturedItemDefaults(array $data): array
+    private function withManufacturedItemDefaults(array $data, bool $includeStock = true): array
     {
         if (($data['jenis_barang'] ?? null) !== 'barang_jadi') {
             return $data;
         }
 
-        foreach (['harga_beli', 'harga_jual', 'stok'] as $field) {
+        $fields = ['harga_beli', 'harga_jual'];
+
+        if ($includeStock) {
+            $fields[] = 'stok';
+        }
+
+        foreach ($fields as $field) {
             if (! array_key_exists($field, $data) || trim((string) $data[$field]) === '') {
                 $data[$field] = 0;
             }

@@ -1,4 +1,5 @@
 @csrf
+@php($isEdit = $isEdit ?? false)
 
 <div class="form-grid">
     <label>
@@ -60,7 +61,17 @@
 
     <label>
         <span>Stok</span>
-        <input type="number" name="stok" id="stok" value="{{ old('stok', $barang->stok) }}" min="0" step="0.001" placeholder="0" required>
+        <input
+            type="number"
+            name="stok"
+            id="stok"
+            value="{{ old('stok', $barang->stok) }}"
+            min="0"
+            step="0.001"
+            placeholder="0"
+            @readonly($isEdit)
+            @required(! $isEdit)
+        >
         @error('stok')
             <small>{{ $message }}</small>
         @enderror
@@ -87,6 +98,10 @@
         const isBarangJadi = jenisBarang.value === 'barang_jadi';
 
         productionFields.forEach((field) => {
+            if (field.readOnly) {
+                return;
+            }
+
             field.required = ! isBarangJadi;
         });
     }

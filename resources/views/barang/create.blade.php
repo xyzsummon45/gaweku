@@ -19,7 +19,7 @@
 
         <section class="panel">
             <form method="POST" action="{{ route('barang.store') }}">
-                @include('barang._form', ['submit' => 'Simpan Barang'])
+                @include('barang._form', ['submit' => 'Simpan Barang', 'isEdit' => false])
             </form>
         </section>
     </main>

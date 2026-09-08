@@ -235,6 +235,12 @@
         resize: vertical;
     }
 
+    input[readonly] {
+        background: #f8fafc;
+        color: #52606d;
+        cursor: default;
+    }
+
     small {
         display: block;
         color: #b42318;

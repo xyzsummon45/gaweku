@@ -7,6 +7,7 @@ use App\Http\Controllers\KasController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\ProduksiController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\TransaksiController;
 
 Route::get('/', function () {
@@ -19,6 +20,8 @@ Route::resource('barang', BarangController::class)->except('show');
 Route::resource('formula', FormulaController::class);
 
 Route::resource('produksi', ProduksiController::class)->only(['index', 'create', 'store', 'show']);
+
+Route::resource('stock-opname', StockOpnameController::class)->only(['index', 'create', 'store']);
 
 Route::resource('supplier', SupplierController::class)->except('show');
 

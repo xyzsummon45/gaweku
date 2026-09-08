@@ -88,4 +88,33 @@ class BarangTest extends TestCase
             'stok' => 0,
         ]);
     }
+
+    public function test_barang_stock_cannot_be_changed_from_edit_barang(): void
+    {
+        $barang = Barang::create([
+            'kode_barang' => 'KAS123',
+            'nama_barang' => 'PIPA PVC 80cm',
+            'jenis_barang' => 'barang_dagang',
+            'satuan' => 'pcs',
+            'harga_beli' => 17000,
+            'harga_jual' => 20000,
+            'stok' => 10,
+        ]);
+
+        $this->put("/barang/{$barang->id}", [
+            'kode_barang' => 'KAS123',
+            'nama_barang' => 'PIPA PVC 80cm',
+            'jenis_barang' => 'barang_dagang',
+            'satuan' => 'pcs',
+            'harga_beli' => 18000,
+            'harga_jual' => 21000,
+            'stok' => 999,
+        ])->assertRedirect('/barang');
+
+        $barang->refresh();
+
+        $this->assertSame('10.000', $barang->stok);
+        $this->assertSame('18000.00', $barang->harga_beli);
+        $this->assertSame('21000.00', $barang->harga_jual);
+    }
 }

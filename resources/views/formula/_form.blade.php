@@ -36,11 +36,16 @@
     </label>
 
     <label>
-        <span>Qty Hasil</span>
+        <span>Formula Ini Menghasilkan</span>
         <input id="qty-hasil" type="text" inputmode="decimal" name="qty_hasil" value="{{ old('qty_hasil', $formula->qty_hasil ?: 1) }}" required>
         @error('qty_hasil')
             <small>{{ $message }}</small>
         @enderror
+    </label>
+
+    <label>
+        <span>Satuan Hasil</span>
+        <input id="satuan-hasil" type="text" value="-" disabled>
     </label>
 
     <label>
@@ -88,7 +93,7 @@
     </label>
 
     <label>
-        <span>Qty Bahan</span>
+        <span>Kebutuhan Bahan untuk Hasil Ini</span>
         <input id="qty-bahan" type="text" inputmode="decimal" value="1">
     </label>
 
@@ -120,7 +125,7 @@
                 <th></th>
             </tr>
             <tr>
-                <th colspan="5" class="number">HPP per Satuan</th>
+                <th id="hpp-label" colspan="5" class="number">HPP per 1 Satuan</th>
                 <th id="hpp" class="number">Rp 0</th>
                 <th></th>
             </tr>
@@ -142,13 +147,16 @@
 
 <script>
     const bahanSelect = document.getElementById('bahan-select');
+    const barangJadiSelect = document.getElementById('barang-jadi');
     const qtyBahanInput = document.getElementById('qty-bahan');
     const qtyHasilInput = document.getElementById('qty-hasil');
+    const satuanHasilInput = document.getElementById('satuan-hasil');
     const marginInput = document.getElementById('margin-persen');
     const addBahanButton = document.getElementById('add-bahan');
     const formulaBody = document.getElementById('formula-body');
     const hiddenItems = document.getElementById('hidden-items');
     const totalBiaya = document.getElementById('total-biaya');
+    const hppLabel = document.getElementById('hpp-label');
     const hpp = document.getElementById('hpp');
     const hargaJualRekomendasi = document.getElementById('harga-jual-rekomendasi');
     const form = document.getElementById('formula-form');
@@ -173,6 +181,7 @@
     });
 
     addBahanButton.addEventListener('click', addBahan);
+    barangJadiSelect.addEventListener('change', syncSatuanHasil);
     qtyHasilInput.addEventListener('input', renderFormula);
     marginInput.addEventListener('input', renderFormula);
 
@@ -199,6 +208,7 @@
         });
     });
 
+    syncSatuanHasil();
     renderFormula();
 
     function addBahan() {
@@ -266,10 +276,12 @@
 
         const qtyHasil = parseDecimal(qtyHasilInput.value);
         const margin = parseDecimal(marginInput.value);
+        const satuanHasil = selectedSatuanHasil();
         const hppValue = Number.isFinite(qtyHasil) && qtyHasil > 0 ? total / qtyHasil : 0;
         const rekomendasi = hppValue + (hppValue * ((Number.isFinite(margin) ? margin : 0) / 100));
 
         totalBiaya.textContent = rupiah.format(total);
+        hppLabel.textContent = `HPP per 1 ${satuanHasil}`;
         hpp.textContent = rupiah.format(hppValue);
         hargaJualRekomendasi.textContent = rupiah.format(rekomendasi);
 
@@ -283,6 +295,17 @@
 
     function parseDecimal(value) {
         return Number.parseFloat(String(value).replace(',', '.'));
+    }
+
+    function syncSatuanHasil() {
+        satuanHasilInput.value = selectedSatuanHasil();
+        renderFormula();
+    }
+
+    function selectedSatuanHasil() {
+        const option = barangJadiSelect.selectedOptions[0];
+
+        return option?.dataset.satuan || 'satuan';
     }
 
     function formatQty(value) {

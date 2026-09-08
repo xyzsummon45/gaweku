@@ -41,4 +41,14 @@ class Barang extends Model
     {
         return $this->hasMany(FormulaItem::class, 'barang_bahan_id');
     }
+
+    public function produksiHasil()
+    {
+        return $this->hasMany(Produksi::class, 'barang_hasil_id');
+    }
+
+    public function produksiItemsBahan()
+    {
+        return $this->hasMany(ProduksiItem::class, 'barang_bahan_id');
+    }
 }

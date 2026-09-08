@@ -5,6 +5,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\FormulaController;
 use App\Http\Controllers\KasController;
 use App\Http\Controllers\PembelianController;
+use App\Http\Controllers\ProduksiController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransaksiController;
 
@@ -16,6 +17,8 @@ Route::post('/barang/import', [BarangController::class, 'import'])->name('barang
 Route::resource('barang', BarangController::class)->except('show');
 
 Route::resource('formula', FormulaController::class);
+
+Route::resource('produksi', ProduksiController::class)->only(['index', 'create', 'store', 'show']);
 
 Route::resource('supplier', SupplierController::class)->except('show');
 

@@ -19,7 +19,7 @@
 
     <label>
         <span>Jenis Barang</span>
-        <select name="jenis_barang" required>
+        <select name="jenis_barang" id="jenis-barang" required>
             @foreach ([
                 'bahan_baku' => 'Bahan Baku',
                 'barang_jadi' => 'Barang Jadi',
@@ -44,7 +44,7 @@
 
     <label>
         <span>Harga Beli</span>
-        <input type="number" name="harga_beli" value="{{ old('harga_beli', $barang->harga_beli) }}" min="0" step="0.01" required>
+        <input type="number" name="harga_beli" id="harga-beli" value="{{ old('harga_beli', $barang->harga_beli) }}" min="0" step="0.01" placeholder="0" required>
         @error('harga_beli')
             <small>{{ $message }}</small>
         @enderror
@@ -52,7 +52,7 @@
 
     <label>
         <span>Harga Jual</span>
-        <input type="number" name="harga_jual" value="{{ old('harga_jual', $barang->harga_jual) }}" min="0" step="0.01" required>
+        <input type="number" name="harga_jual" id="harga-jual" value="{{ old('harga_jual', $barang->harga_jual) }}" min="0" step="0.01" placeholder="0" required>
         @error('harga_jual')
             <small>{{ $message }}</small>
         @enderror
@@ -60,7 +60,7 @@
 
     <label>
         <span>Stok</span>
-        <input type="number" name="stok" value="{{ old('stok', $barang->stok) }}" min="0" step="0.001" required>
+        <input type="number" name="stok" id="stok" value="{{ old('stok', $barang->stok) }}" min="0" step="0.001" placeholder="0" required>
         @error('stok')
             <small>{{ $message }}</small>
         @enderror
@@ -71,3 +71,23 @@
     <button type="submit">{{ $submit }}</button>
     <a href="{{ route('barang.index') }}">Batal</a>
 </div>
+
+<script>
+    const jenisBarang = document.getElementById('jenis-barang');
+    const productionFields = [
+        document.getElementById('harga-beli'),
+        document.getElementById('harga-jual'),
+        document.getElementById('stok'),
+    ];
+
+    jenisBarang.addEventListener('change', syncProductionFields);
+    syncProductionFields();
+
+    function syncProductionFields() {
+        const isBarangJadi = jenisBarang.value === 'barang_jadi';
+
+        productionFields.forEach((field) => {
+            field.required = ! isBarangJadi;
+        });
+    }
+</script>

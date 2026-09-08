@@ -16,7 +16,7 @@ class ProduksiTest extends TestCase
         $tembok = Barang::create([
             'kode_barang' => 'BJ001',
             'nama_barang' => 'TEMBOK',
-            'jenis_barang' => 'barang_dagang',
+            'jenis_barang' => 'barang_jadi',
             'satuan' => 'm2',
             'harga_beli' => 0,
             'harga_jual' => 50000,
@@ -111,7 +111,7 @@ class ProduksiTest extends TestCase
         $tembok = Barang::create([
             'kode_barang' => 'BJ001',
             'nama_barang' => 'TEMBOK',
-            'jenis_barang' => 'barang_dagang',
+            'jenis_barang' => 'barang_jadi',
             'satuan' => 'm2',
             'harga_beli' => 0,
             'harga_jual' => 50000,

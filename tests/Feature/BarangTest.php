@@ -65,4 +65,27 @@ class BarangTest extends TestCase
             'satuan' => 'm2',
         ]);
     }
+
+    public function test_finished_goods_can_be_created_with_empty_prices_and_stock(): void
+    {
+        $this->post('/barang', [
+            'kode_barang' => 'BJ001',
+            'nama_barang' => 'Tembok 1 m2',
+            'jenis_barang' => 'barang_jadi',
+            'satuan' => 'm2',
+            'harga_beli' => '',
+            'harga_jual' => '',
+            'stok' => '',
+        ])->assertRedirect('/barang');
+
+        $this->assertDatabaseHas('barangs', [
+            'kode_barang' => 'BJ001',
+            'nama_barang' => 'Tembok 1 m2',
+            'jenis_barang' => 'barang_jadi',
+            'satuan' => 'm2',
+            'harga_beli' => 0,
+            'harga_jual' => 0,
+            'stok' => 0,
+        ]);
+    }
 }

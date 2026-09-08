@@ -131,6 +131,7 @@ class BarangController extends Controller
                 'harga_jual' => $this->normalizeNumber($row[$columns['harga_jual']]),
                 'stok' => $this->normalizeNumber($row[$columns['stok']]),
             ];
+            $data = $this->withManufacturedItemDefaults($data);
 
             if (implode('', array_map('strval', $data)) === '') {
                 continue;
@@ -164,6 +165,8 @@ class BarangController extends Controller
 
     private function validatedData(Request $request, ?Barang $barang = null): array
     {
+        $this->prepareManufacturedItemDefaults($request);
+
         $data = $request->validate($this->rules($barang));
 
         return $data;
@@ -186,6 +189,30 @@ class BarangController extends Controller
             'harga_jual' => ['required', 'numeric', 'min:0'],
             'stok' => ['required', 'numeric', 'min:0'],
         ];
+    }
+
+    private function prepareManufacturedItemDefaults(Request $request): void
+    {
+        if ($request->input('jenis_barang') !== 'barang_jadi') {
+            return;
+        }
+
+        $request->merge($this->withManufacturedItemDefaults($request->all()));
+    }
+
+    private function withManufacturedItemDefaults(array $data): array
+    {
+        if (($data['jenis_barang'] ?? null) !== 'barang_jadi') {
+            return $data;
+        }
+
+        foreach (['harga_beli', 'harga_jual', 'stok'] as $field) {
+            if (! array_key_exists($field, $data) || trim((string) $data[$field]) === '') {
+                $data[$field] = 0;
+            }
+        }
+
+        return $data;
     }
 
     private function normalizeNumber(mixed $value): string

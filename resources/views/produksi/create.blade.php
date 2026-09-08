@@ -25,6 +25,10 @@
             <div class="alert alert-info">Belum ada formula aktif. Buat formula dulu sebelum produksi.</div>
         @endif
 
+        @if ($barangHasils->isEmpty())
+            <div class="alert alert-info">Belum ada barang jadi. Buat barang dengan jenis Barang Jadi dulu sebelum produksi.</div>
+        @endif
+
         <form method="POST" action="{{ route('produksi.store') }}" id="production-form">
             @csrf
 

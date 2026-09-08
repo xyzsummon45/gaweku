@@ -7,6 +7,7 @@ use App\Models\Formula;
 use App\Models\Produksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class ProduksiController extends Controller
@@ -73,7 +74,7 @@ class ProduksiController extends Controller
                     'stok' => (float) ($item->barangBahan?->stok ?? 0),
                 ])->values(),
             ])->values(),
-            'barangHasils' => Barang::orderBy('nama_barang')->get(),
+            'barangHasils' => Barang::where('jenis_barang', 'barang_jadi')->orderBy('nama_barang')->get(),
         ]);
     }
 
@@ -85,7 +86,11 @@ class ProduksiController extends Controller
 
         $data = $request->validate([
             'formula_id' => ['required', 'integer', 'exists:formulas,id'],
-            'barang_hasil_id' => ['required', 'integer', 'exists:barangs,id'],
+            'barang_hasil_id' => [
+                'required',
+                'integer',
+                Rule::exists('barangs', 'id')->where('jenis_barang', 'barang_jadi'),
+            ],
             'tanggal' => ['required', 'date'],
             'qty_produksi' => ['required', 'numeric', 'min:0.001'],
             'catatan' => ['nullable', 'string', 'max:1000'],

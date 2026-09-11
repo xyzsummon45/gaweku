@@ -45,9 +45,9 @@
                         <th>Formula</th>
                         <th class="number">Hasil</th>
                         <th class="number">Bahan</th>
-                        <th class="number">HPP</th>
+                        <th class="number">HPP Bahan</th>
                         <th class="number">Margin</th>
-                        <th class="number">Rekomendasi Jual</th>
+                        <th class="number">Estimasi Jual</th>
                         <th>Status</th>
                         <th class="number">Aksi</th>
                     </tr>

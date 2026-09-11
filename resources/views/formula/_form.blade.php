@@ -113,17 +113,17 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="5" class="number">Total Biaya Formula</th>
+                <th colspan="5" class="number">Total Biaya Bahan</th>
                 <th id="total-biaya" class="number">Rp 0</th>
                 <th></th>
             </tr>
             <tr>
-                <th id="hpp-label" colspan="5" class="number">HPP per 1 Satuan</th>
+                <th id="hpp-label" colspan="5" class="number">HPP Bahan per 1 Satuan</th>
                 <th id="hpp" class="number">Rp 0</th>
                 <th></th>
             </tr>
             <tr>
-                <th colspan="5" class="number">Rekomendasi Harga Jual</th>
+                <th colspan="5" class="number">Estimasi Harga Jual dari Bahan</th>
                 <th id="harga-jual-rekomendasi" class="number">Rp 0</th>
                 <th></th>
             </tr>
@@ -272,7 +272,7 @@
         const rekomendasi = hppValue + (hppValue * ((Number.isFinite(margin) ? margin : 0) / 100));
 
         totalBiaya.textContent = rupiah.format(total);
-        hppLabel.textContent = `HPP per 1 ${satuanHasil}`;
+        hppLabel.textContent = `HPP Bahan per 1 ${satuanHasil}`;
         hpp.textContent = rupiah.format(hppValue);
         hargaJualRekomendasi.textContent = rupiah.format(rekomendasi);
 

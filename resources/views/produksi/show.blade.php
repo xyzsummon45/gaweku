@@ -36,11 +36,11 @@
                 <strong>{{ rtrim(rtrim(number_format($produksi->qty_produksi, 3, ',', '.'), '0'), ',') }} {{ $produksi->satuan_hasil }}</strong>
             </div>
             <div>
-                <span>Total Biaya</span>
+                <span>Total Biaya Batch</span>
                 <strong>Rp {{ number_format($produksi->total_biaya, 0, ',', '.') }}</strong>
             </div>
             <div>
-                <span>HPP</span>
+                <span>HPP per {{ $produksi->satuan_hasil }}</span>
                 <strong>Rp {{ number_format($produksi->hpp, 0, ',', '.') }}</strong>
             </div>
             <div>

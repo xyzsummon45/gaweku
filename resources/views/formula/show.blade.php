@@ -35,15 +35,15 @@
                 <strong>{{ $formula->aktif ? 'Aktif' : 'Nonaktif' }}</strong>
             </div>
             <div>
-                <span>Total Biaya Formula</span>
+                <span>Total Biaya Bahan</span>
                 <strong>Rp {{ number_format($formula->total_biaya, 0, ',', '.') }}</strong>
             </div>
             <div>
-                <span>HPP per {{ $formula->satuan_hasil }}</span>
+                <span>HPP Bahan per {{ $formula->satuan_hasil }}</span>
                 <strong>Rp {{ number_format($formula->hpp, 0, ',', '.') }}</strong>
             </div>
             <div>
-                <span>Rekomendasi Jual</span>
+                <span>Estimasi Jual dari Bahan</span>
                 <strong>Rp {{ number_format($formula->harga_jual_rekomendasi, 0, ',', '.') }}</strong>
             </div>
         </section>
@@ -64,7 +64,7 @@
                         <th class="number">Qty</th>
                         <th>Satuan</th>
                         <th class="number">Harga Beli</th>
-                        <th class="number">Subtotal</th>
+                        <th class="number">Subtotal Bahan</th>
                     </tr>
                 </thead>
                 <tbody>

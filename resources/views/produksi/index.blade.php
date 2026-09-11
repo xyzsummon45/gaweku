@@ -58,8 +58,8 @@
                         <th>Barang Hasil</th>
                         <th class="number">Qty Produksi</th>
                         <th class="number">Bahan</th>
-                        <th class="number">Total Biaya</th>
-                        <th class="number">HPP</th>
+                        <th class="number">Total Biaya Batch</th>
+                        <th class="number">HPP per Satuan</th>
                         <th class="number">Aksi</th>
                     </tr>
                 </thead>

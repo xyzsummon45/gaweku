@@ -133,7 +133,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="5" class="number">Total Biaya Produksi</th>
+                            <th colspan="5" class="number">Total Biaya Batch</th>
                             <th id="total-biaya" class="number">Rp 0</th>
                             <th></th>
                         </tr>

@@ -37,4 +37,9 @@ class Formula extends Model
     {
         return $this->hasMany(FormulaItem::class);
     }
+
+    public function produksis()
+    {
+        return $this->hasMany(Produksi::class);
+    }
 }

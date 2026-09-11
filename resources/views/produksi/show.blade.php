@@ -44,9 +44,39 @@
                 <strong>Rp {{ number_format($produksi->hpp, 0, ',', '.') }}</strong>
             </div>
             <div>
+                <span>Margin Formula</span>
+                <strong>{{ rtrim(rtrim(number_format($produksi->margin_persen, 2, ',', '.'), '0'), ',') }}%</strong>
+            </div>
+            <div>
+                <span>Rekomendasi Harga Jual</span>
+                <strong>Rp {{ number_format($produksi->harga_jual_rekomendasi, 0, ',', '.') }}</strong>
+            </div>
+            <div>
+                <span>Harga Jual Barang Sekarang</span>
+                <strong>Rp {{ number_format($produksi->barangHasil->harga_jual, 0, ',', '.') }}</strong>
+            </div>
+            <div>
                 <span>Tanggal</span>
                 <strong>{{ $produksi->tanggal->format('d/m/Y H:i') }}</strong>
             </div>
+        </section>
+
+        <section class="panel toolbar">
+            <div>
+                <strong>Harga Jual dari Produksi Ini</strong>
+                <p>
+                    HPP aktual Rp {{ number_format($produksi->hpp, 0, ',', '.') }}
+                    + margin {{ rtrim(rtrim(number_format($produksi->margin_persen, 2, ',', '.'), '0'), ',') }}%
+                    = Rp {{ number_format($produksi->harga_jual_rekomendasi, 0, ',', '.') }}.
+                    @if ($produksi->harga_jual_diterapkan_at)
+                        Diterapkan pada {{ $produksi->harga_jual_diterapkan_at->format('d/m/Y H:i') }}.
+                    @endif
+                </p>
+            </div>
+            <form method="POST" action="{{ route('produksi.terapkan-harga-jual', $produksi) }}" onsubmit="return confirm('Terapkan harga jual Rp {{ number_format($produksi->harga_jual_rekomendasi, 0, ',', '.') }} ke {{ $produksi->barangHasil->nama_barang }}?')">
+                @csrf
+                <button type="submit">Terapkan Harga Jual Rp {{ number_format($produksi->harga_jual_rekomendasi, 0, ',', '.') }}</button>
+            </form>
         </section>
 
         @if ($produksi->catatan)

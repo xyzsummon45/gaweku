@@ -152,6 +152,8 @@ class ProduksiController extends Controller
                 'qty_produksi' => $data['qty_produksi'],
                 'total_biaya' => 0,
                 'hpp' => 0,
+                'margin_persen' => $formula->margin_persen,
+                'harga_jual_rekomendasi' => 0,
                 'catatan' => $data['catatan'] ?? null,
             ]);
 
@@ -188,6 +190,7 @@ class ProduksiController extends Controller
             }
 
             $hpp = $totalBiaya / (float) $data['qty_produksi'];
+            $hargaJualRekomendasi = $hpp + ($hpp * ((float) $formula->margin_persen / 100));
 
             $barangHasil = $barangs->get((int) $data['barang_hasil_id']);
             $barangHasil->update([
@@ -200,6 +203,7 @@ class ProduksiController extends Controller
             $produksi->update([
                 'total_biaya' => $totalBiaya,
                 'hpp' => $hpp,
+                'harga_jual_rekomendasi' => $hargaJualRekomendasi,
             ]);
 
             return $produksi;
@@ -215,6 +219,27 @@ class ProduksiController extends Controller
         $produksi->load(['barangHasil', 'items', 'biayas']);
 
         return view('produksi.show', compact('produksi'));
+    }
+
+    public function terapkanHargaJual(Produksi $produksi)
+    {
+        DB::transaction(function () use ($produksi) {
+            $produksi = Produksi::whereKey($produksi->id)->lockForUpdate()->firstOrFail();
+            $barang = Barang::whereKey($produksi->barang_hasil_id)->lockForUpdate()->firstOrFail();
+
+            $barang->update([
+                'harga_jual' => $produksi->harga_jual_rekomendasi,
+            ]);
+
+            $produksi->update([
+                'harga_jual_diterapkan' => $produksi->harga_jual_rekomendasi,
+                'harga_jual_diterapkan_at' => now(),
+            ]);
+        });
+
+        return redirect()
+            ->route('produksi.show', $produksi)
+            ->with('success', 'Harga jual barang berhasil diterapkan dari rekomendasi produksi.');
     }
 
     private function nextProductionCode(): string

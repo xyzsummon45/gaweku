@@ -17,6 +17,10 @@ class Produksi extends Model
         'qty_produksi',
         'total_biaya',
         'hpp',
+        'margin_persen',
+        'harga_jual_rekomendasi',
+        'harga_jual_diterapkan',
+        'harga_jual_diterapkan_at',
         'catatan',
     ];
 
@@ -26,6 +30,10 @@ class Produksi extends Model
         'qty_produksi' => 'decimal:3',
         'total_biaya' => 'decimal:2',
         'hpp' => 'decimal:2',
+        'margin_persen' => 'decimal:2',
+        'harga_jual_rekomendasi' => 'decimal:2',
+        'harga_jual_diterapkan' => 'decimal:2',
+        'harga_jual_diterapkan_at' => 'datetime',
     ];
 
     public function formula()

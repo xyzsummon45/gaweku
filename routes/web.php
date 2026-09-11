@@ -19,6 +19,7 @@ Route::resource('barang', BarangController::class)->except('show');
 
 Route::resource('formula', FormulaController::class);
 
+Route::post('/produksi/{produksi}/terapkan-harga-jual', [ProduksiController::class, 'terapkanHargaJual'])->name('produksi.terapkan-harga-jual');
 Route::resource('produksi', ProduksiController::class)->only(['index', 'create', 'store', 'show']);
 
 Route::resource('stock-opname', StockOpnameController::class)->only(['index', 'create', 'store']);

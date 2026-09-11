@@ -82,6 +82,7 @@ class ProduksiController extends Controller
     {
         $request->merge([
             'qty_produksi' => $this->normalizeNumber($request->input('qty_produksi')),
+            'biaya' => $this->normalizeBiayaTambahan($request->input('biaya', [])),
         ]);
 
         $data = $request->validate([
@@ -93,6 +94,9 @@ class ProduksiController extends Controller
             ],
             'tanggal' => ['required', 'date'],
             'qty_produksi' => ['required', 'numeric', 'min:0.001'],
+            'biaya' => ['nullable', 'array'],
+            'biaya.*.nama_biaya' => ['required_with:biaya.*.nominal', 'string', 'max:255'],
+            'biaya.*.nominal' => ['required_with:biaya.*.nama_biaya', 'numeric', 'min:0'],
             'catatan' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -174,6 +178,15 @@ class ProduksiController extends Controller
                 $totalBiaya += $subtotal;
             }
 
+            foreach ($data['biaya'] ?? [] as $biaya) {
+                $produksi->biayas()->create([
+                    'nama_biaya' => $biaya['nama_biaya'],
+                    'nominal' => $biaya['nominal'],
+                ]);
+
+                $totalBiaya += (float) $biaya['nominal'];
+            }
+
             $hpp = $totalBiaya / (float) $data['qty_produksi'];
 
             $barangHasil = $barangs->get((int) $data['barang_hasil_id']);
@@ -199,7 +212,7 @@ class ProduksiController extends Controller
 
     public function show(Produksi $produksi)
     {
-        $produksi->load(['barangHasil', 'items']);
+        $produksi->load(['barangHasil', 'items', 'biayas']);
 
         return view('produksi.show', compact('produksi'));
     }
@@ -215,6 +228,33 @@ class ProduksiController extends Controller
     private function normalizeNumber(mixed $value): string
     {
         return str_replace(',', '.', trim((string) $value));
+    }
+
+    private function normalizeBiayaTambahan(mixed $rows): array
+    {
+        if (! is_array($rows)) {
+            return [];
+        }
+
+        return collect($rows)
+            ->map(fn ($row) => [
+                'nama_biaya' => trim((string) ($row['nama_biaya'] ?? '')),
+                'nominal' => $this->normalizeMoney($row['nominal'] ?? ''),
+            ])
+            ->filter(fn ($row) => $row['nama_biaya'] !== '' || $row['nominal'] !== '')
+            ->values()
+            ->all();
+    }
+
+    private function normalizeMoney(mixed $value): string
+    {
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        return str_replace(',', '.', str_replace('.', '', $value));
     }
 
     private function formatQty(float $value): string

@@ -77,6 +77,10 @@ class ProduksiTest extends TestCase
             'barang_hasil_id' => $tembok->id,
             'tanggal' => '2026-09-08 10:00:00',
             'qty_produksi' => '2,5',
+            'biaya' => [
+                ['nama_biaya' => 'Listrik', 'nominal' => '20.000'],
+                ['nama_biaya' => 'Lem', 'nominal' => '5000'],
+            ],
             'catatan' => 'Batch pagi',
         ]);
 
@@ -86,8 +90,16 @@ class ProduksiTest extends TestCase
             'barang_hasil_id' => $tembok->id,
             'nama_formula' => 'Formula Tembok 1 m2',
             'qty_produksi' => 2.5,
-            'total_biaya' => 75000,
-            'hpp' => 30000,
+            'total_biaya' => 100000,
+            'hpp' => 40000,
+        ]);
+        $this->assertDatabaseHas('produksi_biayas', [
+            'nama_biaya' => 'Listrik',
+            'nominal' => 20000,
+        ]);
+        $this->assertDatabaseHas('produksi_biayas', [
+            'nama_biaya' => 'Lem',
+            'nominal' => 5000,
         ]);
         $this->assertDatabaseHas('produksi_items', [
             'barang_bahan_id' => $bata->id,
@@ -103,7 +115,7 @@ class ProduksiTest extends TestCase
         $this->assertSame('17.500', $semen->fresh()->stok);
         $this->assertSame('2.500', $tembok->fresh()->stok);
         $this->assertSame('barang_jadi', $tembok->fresh()->jenis_barang);
-        $this->assertSame('30000.00', $tembok->fresh()->harga_beli);
+        $this->assertSame('40000.00', $tembok->fresh()->harga_beli);
     }
 
     public function test_production_is_rejected_when_material_stock_is_not_enough(): void

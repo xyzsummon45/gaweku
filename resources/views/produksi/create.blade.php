@@ -74,6 +74,46 @@
             </section>
 
             <section class="panel table-wrap">
+                <div class="toolbar">
+                    <div>
+                        <strong>Biaya Tambahan</strong>
+                    </div>
+                    <button type="button" id="add-biaya">Tambah Biaya</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama Biaya</th>
+                            <th class="number">Nominal</th>
+                            <th class="number">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="biaya-body">
+                        @foreach (old('biaya', [['nama_biaya' => '', 'nominal' => '']]) as $index => $biaya)
+                            <tr>
+                                <td>
+                                    <input type="text" name="biaya[{{ $index }}][nama_biaya]" value="{{ $biaya['nama_biaya'] ?? '' }}" placeholder="Contoh: Listrik">
+                                </td>
+                                <td>
+                                    <input class="number-input biaya-nominal" type="text" inputmode="decimal" name="biaya[{{ $index }}][nominal]" value="{{ $biaya['nominal'] ?? '' }}" placeholder="0">
+                                </td>
+                                <td class="number">
+                                    <button class="secondary-button remove-biaya" type="button">Hapus</button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="number" colspan="2">Total Biaya Tambahan</th>
+                            <th id="total-biaya-tambahan" class="number">Rp 0</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </section>
+
+            <section class="panel table-wrap">
                 <table>
                     <thead>
                         <tr>
@@ -117,10 +157,14 @@
         const formulaSelect = document.getElementById('formula-select');
         const qtyProduksiInput = document.getElementById('qty-produksi');
         const materialBody = document.getElementById('material-body');
+        const biayaBody = document.getElementById('biaya-body');
+        const addBiaya = document.getElementById('add-biaya');
+        const totalBiayaTambahan = document.getElementById('total-biaya-tambahan');
         const totalBiaya = document.getElementById('total-biaya');
         const hpp = document.getElementById('hpp');
         const hppLabel = document.getElementById('hpp-label');
         const formulas = @json($formulaOptions);
+        let biayaIndex = {{ count(old('biaya', [['nama_biaya' => '', 'nominal' => '']])) }};
 
         const rupiah = new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -130,6 +174,9 @@
 
         formulaSelect.addEventListener('change', renderMaterials);
         qtyProduksiInput.addEventListener('input', renderMaterials);
+        biayaBody.addEventListener('input', renderMaterials);
+        biayaBody.addEventListener('click', handleBiayaClick);
+        addBiaya.addEventListener('click', addBiayaRow);
         renderMaterials();
 
         function renderMaterials() {
@@ -140,7 +187,9 @@
 
             if (! formula) {
                 materialBody.innerHTML = '<tr><td class="empty" colspan="7">Pilih formula untuk melihat kebutuhan bahan.</td></tr>';
-                totalBiaya.textContent = rupiah.format(0);
+                const totalTambahan = calculateBiayaTambahan();
+                totalBiayaTambahan.textContent = rupiah.format(totalTambahan);
+                totalBiaya.textContent = rupiah.format(totalTambahan);
                 hpp.textContent = rupiah.format(0);
                 hppLabel.textContent = 'HPP per 1 satuan';
                 return;
@@ -168,14 +217,63 @@
                 materialBody.appendChild(row);
             });
 
+            const totalTambahan = calculateBiayaTambahan();
+            total += totalTambahan;
             const hppValue = Number.isFinite(qtyProduksi) && qtyProduksi > 0 ? total / qtyProduksi : 0;
+            totalBiayaTambahan.textContent = rupiah.format(totalTambahan);
             totalBiaya.textContent = rupiah.format(total);
             hpp.textContent = rupiah.format(hppValue);
             hppLabel.textContent = `HPP per 1 ${formula.satuan_hasil}`;
         }
 
+        function addBiayaRow() {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <input type="text" name="biaya[${biayaIndex}][nama_biaya]" placeholder="Contoh: Listrik">
+                </td>
+                <td>
+                    <input class="number-input biaya-nominal" type="text" inputmode="decimal" name="biaya[${biayaIndex}][nominal]" placeholder="0">
+                </td>
+                <td class="number">
+                    <button class="secondary-button remove-biaya" type="button">Hapus</button>
+                </td>
+            `;
+            biayaBody.appendChild(row);
+            biayaIndex++;
+        }
+
+        function handleBiayaClick(event) {
+            if (! event.target.classList.contains('remove-biaya')) {
+                return;
+            }
+
+            const rows = biayaBody.querySelectorAll('tr');
+
+            if (rows.length === 1) {
+                rows[0].querySelectorAll('input').forEach((input) => input.value = '');
+            } else {
+                event.target.closest('tr').remove();
+            }
+
+            renderMaterials();
+        }
+
+        function calculateBiayaTambahan() {
+            return Array.from(document.querySelectorAll('.biaya-nominal'))
+                .reduce((sum, input) => {
+                    const nominal = parseMoney(input.value);
+                    return sum + (Number.isFinite(nominal) && nominal > 0 ? nominal : 0);
+                }, 0);
+        }
+
         function parseDecimal(value) {
             return Number.parseFloat(String(value).replace(',', '.'));
+        }
+
+        function parseMoney(value) {
+            const normalized = String(value).trim().replaceAll('.', '').replace(',', '.');
+            return Number.parseFloat(normalized);
         }
 
         function formatQty(value) {

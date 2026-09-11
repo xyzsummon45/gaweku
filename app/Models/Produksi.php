@@ -42,4 +42,9 @@ class Produksi extends Model
     {
         return $this->hasMany(ProduksiItem::class);
     }
+
+    public function biayas()
+    {
+        return $this->hasMany(ProduksiBiaya::class);
+    }
 }

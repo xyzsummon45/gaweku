@@ -57,6 +57,7 @@
         @endif
 
         <section class="panel table-wrap">
+            <strong>Bahan Produksi</strong>
             <table>
                 <thead>
                     <tr>
@@ -82,6 +83,38 @@
                         </tr>
                     @endforeach
                 </tbody>
+            </table>
+        </section>
+
+        <section class="panel table-wrap">
+            <strong>Biaya Tambahan</strong>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Biaya</th>
+                        <th class="number">Nominal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($produksi->biayas as $biaya)
+                        <tr>
+                            <td>{{ $biaya->nama_biaya }}</td>
+                            <td class="number">Rp {{ number_format($biaya->nominal, 0, ',', '.') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td class="empty" colspan="2">Tidak ada biaya tambahan.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+                @if ($produksi->biayas->isNotEmpty())
+                    <tfoot>
+                        <tr>
+                            <th class="number">Total Biaya Tambahan</th>
+                            <th class="number">Rp {{ number_format($produksi->biayas->sum('nominal'), 0, ',', '.') }}</th>
+                        </tr>
+                    </tfoot>
+                @endif
             </table>
         </section>
     </main>

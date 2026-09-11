@@ -53,9 +53,34 @@ class StockOpnameController extends Controller
 
     public function create()
     {
-        return view('stock-opname.create', [
-            'barangs' => Barang::orderBy('nama_barang')->get(),
-        ]);
+        return view('stock-opname.create');
+    }
+
+    public function autocompleteBarang(Request $request)
+    {
+        $keyword = trim((string) $request->query('q'));
+
+        if (strlen($keyword) < 2) {
+            return response()->json([]);
+        }
+
+        $barangs = Barang::query()
+            ->where(function ($query) use ($keyword) {
+                $query->where('nama_barang', 'like', "%{$keyword}%")
+                    ->orWhere('kode_barang', 'like', "%{$keyword}%");
+            })
+            ->orderBy('nama_barang')
+            ->limit(10)
+            ->get(['id', 'kode_barang', 'nama_barang', 'jenis_barang', 'satuan', 'stok']);
+
+        return response()->json($barangs->map(fn (Barang $barang) => [
+            'id' => $barang->id,
+            'kode_barang' => $barang->kode_barang,
+            'nama_barang' => $barang->nama_barang,
+            'jenis_barang' => ucwords(str_replace('_', ' ', $barang->jenis_barang)),
+            'satuan' => $barang->satuan,
+            'stok' => (float) $barang->stok,
+        ]));
     }
 
     public function store(Request $request)

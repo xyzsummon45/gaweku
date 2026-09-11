@@ -41,4 +41,39 @@ class StockOpnameTest extends TestCase
             'catatan' => 'Opname gudang',
         ]);
     }
+
+    public function test_stock_opname_barang_autocomplete_searches_by_keyword(): void
+    {
+        Barang::create([
+            'kode_barang' => 'AAA11',
+            'nama_barang' => 'SEMEN PUTIH',
+            'jenis_barang' => 'bahan_baku',
+            'satuan' => 'kg',
+            'harga_beli' => 20000,
+            'harga_jual' => 30000,
+            'stok' => 8,
+        ]);
+
+        Barang::create([
+            'kode_barang' => 'KAS123',
+            'nama_barang' => 'PIPA PVC 80cm',
+            'jenis_barang' => 'barang_dagang',
+            'satuan' => 'pcs',
+            'harga_beli' => 17000,
+            'harga_jual' => 20000,
+            'stok' => 4,
+        ]);
+
+        $this->getJson('/stock-opname/autocomplete-barang?q=semen')
+            ->assertOk()
+            ->assertJsonFragment([
+                'kode_barang' => 'AAA11',
+                'nama_barang' => 'SEMEN PUTIH',
+                'satuan' => 'kg',
+                'stok' => 8,
+            ])
+            ->assertJsonMissing([
+                'kode_barang' => 'KAS123',
+            ]);
+    }
 }

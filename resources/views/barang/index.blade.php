@@ -77,11 +77,6 @@
                             <td>
                                 <div class="row-actions">
                                     <a class="secondary-button" href="{{ route('barang.edit', $barang) }}">Edit</a>
-                                    <form method="POST" action="{{ route('barang.destroy', $barang) }}" onsubmit="return confirm('Hapus barang ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="danger-button" type="submit">Hapus</button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>

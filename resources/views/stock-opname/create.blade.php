@@ -27,19 +27,11 @@
             <section class="panel form-grid">
                 <label>
                     <span>Barang</span>
-                    <select name="barang_id" id="barang-select" required>
-                        <option value="">Pilih barang</option>
-                        @foreach ($barangs as $barang)
-                            <option
-                                value="{{ $barang->id }}"
-                                data-stok="{{ (float) $barang->stok }}"
-                                data-satuan="{{ $barang->satuan }}"
-                                @selected((string) old('barang_id') === (string) $barang->id)
-                            >
-                                {{ $barang->kode_barang }} - {{ $barang->nama_barang }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="item-search">
+                        <input id="barang-search" type="text" placeholder="Ketik minimal 2 huruf, contoh: semen" autocomplete="off">
+                        <input id="barang-id" type="hidden" name="barang_id" value="{{ old('barang_id') }}">
+                        <div id="suggestions" class="suggestions" hidden></div>
+                    </div>
                 </label>
 
                 <label>
@@ -71,23 +63,77 @@
     </main>
 
     <script>
-        const barangSelect = document.getElementById('barang-select');
+        const searchInput = document.getElementById('barang-search');
+        const barangIdInput = document.getElementById('barang-id');
+        const suggestions = document.getElementById('suggestions');
         const stokSistem = document.getElementById('stok-sistem');
+        const autocompleteUrl = @json(route('stock-opname.autocomplete-barang'));
+        let selectedBarang = null;
+        let searchTimer = null;
 
-        barangSelect.addEventListener('change', syncStock);
-        syncStock();
+        searchInput.addEventListener('input', () => {
+            selectedBarang = null;
+            barangIdInput.value = '';
+            stokSistem.value = 'Pilih barang';
+            clearTimeout(searchTimer);
 
-        function syncStock() {
-            const option = barangSelect.selectedOptions[0];
+            const keyword = searchInput.value.trim();
 
-            if (! option || ! option.value) {
-                stokSistem.value = 'Pilih barang';
+            if (keyword.length < 2) {
+                suggestions.hidden = true;
+                suggestions.innerHTML = '';
                 return;
             }
 
-            const stock = Number.parseFloat(option.dataset.stok || '0');
-            const satuan = option.dataset.satuan || '';
-            stokSistem.value = `${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 3 }).format(stock)} ${satuan}`;
+            searchTimer = setTimeout(async () => {
+                const response = await fetch(`${autocompleteUrl}?q=${encodeURIComponent(keyword)}`);
+                const items = await response.json();
+                renderSuggestions(items);
+            }, 250);
+        });
+
+        function renderSuggestions(items) {
+            suggestions.innerHTML = '';
+
+            if (items.length === 0) {
+                suggestions.hidden = true;
+                return;
+            }
+
+            items.forEach((item) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'suggestion-item';
+                button.innerHTML = `
+                    <strong>${escapeHtml(item.nama_barang)}</strong>
+                    <span>${escapeHtml(item.kode_barang)} | ${escapeHtml(item.jenis_barang)} | Stok ${formatQty(item.stok)} ${escapeHtml(item.satuan)}</span>
+                `;
+                button.addEventListener('click', () => {
+                    selectedBarang = item;
+                    barangIdInput.value = item.id;
+                    searchInput.value = `${item.kode_barang} - ${item.nama_barang}`;
+                    stokSistem.value = `${formatQty(item.stok)} ${item.satuan}`;
+                    suggestions.hidden = true;
+                });
+                suggestions.appendChild(button);
+            });
+
+            suggestions.hidden = false;
+        }
+
+        function formatQty(value) {
+            return new Intl.NumberFormat('id-ID', {
+                maximumFractionDigits: 3,
+            }).format(value);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
         }
     </script>
 </body>

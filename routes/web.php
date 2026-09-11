@@ -22,6 +22,7 @@ Route::resource('formula', FormulaController::class);
 Route::post('/produksi/{produksi}/terapkan-harga-jual', [ProduksiController::class, 'terapkanHargaJual'])->name('produksi.terapkan-harga-jual');
 Route::resource('produksi', ProduksiController::class)->only(['index', 'create', 'store', 'show']);
 
+Route::get('/stock-opname/autocomplete-barang', [StockOpnameController::class, 'autocompleteBarang'])->name('stock-opname.autocomplete-barang');
 Route::resource('stock-opname', StockOpnameController::class)->only(['index', 'create', 'store']);
 
 Route::resource('supplier', SupplierController::class)->except('show');

@@ -190,7 +190,7 @@ class ProduksiController extends Controller
             }
 
             $hpp = $totalBiaya / (float) $data['qty_produksi'];
-            $hargaJualRekomendasi = $hpp + ($hpp * ((float) $formula->margin_persen / 100));
+            $hargaJualRekomendasi = $this->roundUpToThousand($hpp + ($hpp * ((float) $formula->margin_persen / 100)));
 
             $barangHasil = $barangs->get((int) $data['barang_hasil_id']);
             $barangHasil->update([
@@ -285,5 +285,10 @@ class ProduksiController extends Controller
     private function formatQty(float $value): string
     {
         return rtrim(rtrim(number_format(max(0, $value), 3, ',', '.'), '0'), ',');
+    }
+
+    private function roundUpToThousand(float $value): float
+    {
+        return ceil($value / 1000) * 1000;
     }
 }

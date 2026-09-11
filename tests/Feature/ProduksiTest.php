@@ -79,7 +79,7 @@ class ProduksiTest extends TestCase
             'qty_produksi' => '2,5',
             'biaya' => [
                 ['nama_biaya' => 'Listrik', 'nominal' => '20.000'],
-                ['nama_biaya' => 'Lem', 'nominal' => '5000'],
+                ['nama_biaya' => 'Lem', 'nominal' => '5500'],
             ],
             'catatan' => 'Batch pagi',
         ]);
@@ -90,10 +90,10 @@ class ProduksiTest extends TestCase
             'barang_hasil_id' => $tembok->id,
             'nama_formula' => 'Formula Tembok 1 m2',
             'qty_produksi' => 2.5,
-            'total_biaya' => 100000,
-            'hpp' => 40000,
+            'total_biaya' => 100500,
+            'hpp' => 40200,
             'margin_persen' => 10,
-            'harga_jual_rekomendasi' => 44000,
+            'harga_jual_rekomendasi' => 45000,
         ]);
         $this->assertDatabaseHas('produksi_biayas', [
             'nama_biaya' => 'Listrik',
@@ -101,7 +101,7 @@ class ProduksiTest extends TestCase
         ]);
         $this->assertDatabaseHas('produksi_biayas', [
             'nama_biaya' => 'Lem',
-            'nominal' => 5000,
+            'nominal' => 5500,
         ]);
         $this->assertDatabaseHas('produksi_items', [
             'barang_bahan_id' => $bata->id,
@@ -117,7 +117,7 @@ class ProduksiTest extends TestCase
         $this->assertSame('17.500', $semen->fresh()->stok);
         $this->assertSame('2.500', $tembok->fresh()->stok);
         $this->assertSame('barang_jadi', $tembok->fresh()->jenis_barang);
-        $this->assertSame('40000.00', $tembok->fresh()->harga_beli);
+        $this->assertSame('40200.00', $tembok->fresh()->harga_beli);
         $this->assertSame('50000.00', $tembok->fresh()->harga_jual);
     }
 
@@ -152,19 +152,19 @@ class ProduksiTest extends TestCase
             'qty_formula_hasil' => 1,
             'satuan_hasil' => 'm2',
             'qty_produksi' => 2.5,
-            'total_biaya' => 100000,
-            'hpp' => 40000,
+            'total_biaya' => 100500,
+            'hpp' => 40200,
             'margin_persen' => 10,
-            'harga_jual_rekomendasi' => 44000,
+            'harga_jual_rekomendasi' => 45000,
         ]);
 
         $this->post("/produksi/{$produksi->id}/terapkan-harga-jual")
             ->assertRedirect("/produksi/{$produksi->id}");
 
-        $this->assertSame('44000.00', $tembok->fresh()->harga_jual);
+        $this->assertSame('45000.00', $tembok->fresh()->harga_jual);
         $this->assertDatabaseHas('produksis', [
             'id' => $produksi->id,
-            'harga_jual_diterapkan' => 44000,
+            'harga_jual_diterapkan' => 45000,
         ]);
     }
 

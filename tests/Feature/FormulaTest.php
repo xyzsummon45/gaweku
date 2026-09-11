@@ -112,7 +112,7 @@ class FormulaTest extends TestCase
             'satuan_hasil' => 'm2',
             'total_biaya' => 10000,
             'hpp' => 5000,
-            'harga_jual_rekomendasi' => 5500,
+            'harga_jual_rekomendasi' => 6000,
         ]);
     }
 

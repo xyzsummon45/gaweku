@@ -269,7 +269,7 @@
         const margin = parseDecimal(marginInput.value);
         const satuanHasil = selectedSatuanHasilForLabel();
         const hppValue = Number.isFinite(qtyHasil) && qtyHasil > 0 ? total / qtyHasil : 0;
-        const rekomendasi = hppValue + (hppValue * ((Number.isFinite(margin) ? margin : 0) / 100));
+        const rekomendasi = roundUpToThousand(hppValue + (hppValue * ((Number.isFinite(margin) ? margin : 0) / 100)));
 
         totalBiaya.textContent = rupiah.format(total);
         hppLabel.textContent = `HPP Bahan per 1 ${satuanHasil}`;
@@ -302,6 +302,10 @@
 
     function formatQtyForInput(value) {
         return Number.parseFloat(value).toFixed(3).replace(/\.?0+$/, '');
+    }
+
+    function roundUpToThousand(value) {
+        return Math.ceil(value / 1000) * 1000;
     }
 
     function escapeHtml(value) {

@@ -180,7 +180,7 @@ class FormulaController extends Controller
         }
 
         $hpp = $totalBiaya / (float) $data['qty_hasil'];
-        $hargaJualRekomendasi = $hpp + ($hpp * ((float) $data['margin_persen'] / 100));
+        $hargaJualRekomendasi = $this->roundUpToThousand($hpp + ($hpp * ((float) $data['margin_persen'] / 100)));
 
         return [
             'total_biaya' => $totalBiaya,
@@ -199,5 +199,10 @@ class FormulaController extends Controller
         $value = trim((string) $value);
 
         return $value !== '' ? $value : 'pcs';
+    }
+
+    private function roundUpToThousand(float $value): float
+    {
+        return ceil($value / 1000) * 1000;
     }
 }

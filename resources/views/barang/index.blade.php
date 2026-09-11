@@ -76,7 +76,11 @@
                             <td class="number">{{ rtrim(rtrim(number_format($barang->stok, 3, ',', '.'), '0'), ',') }}</td>
                             <td>
                                 <div class="row-actions">
-                                    <a class="secondary-button" href="{{ route('barang.edit', $barang) }}">Edit</a>
+                                    @if ($barang->jenis_barang !== 'barang_jadi')
+                                        <a class="secondary-button" href="{{ route('barang.edit', $barang) }}">Edit</a>
+                                    @else
+                                        <span class="secondary-button">Terkunci</span>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

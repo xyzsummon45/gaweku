@@ -58,6 +58,12 @@ class BarangController extends Controller
 
     public function edit(Barang $barang)
     {
+        if ($barang->jenis_barang === 'barang_jadi') {
+            return redirect()
+                ->route('barang.index')
+                ->withErrors(['barang' => 'Barang jadi tidak bisa diedit dari master barang. Gunakan produksi untuk HPP/stok dan tombol apply harga jual untuk harga jual.']);
+        }
+
         return view('barang.edit', [
             'barang' => $barang,
         ]);
@@ -65,6 +71,12 @@ class BarangController extends Controller
 
     public function update(Request $request, Barang $barang)
     {
+        if ($barang->jenis_barang === 'barang_jadi') {
+            return redirect()
+                ->route('barang.index')
+                ->withErrors(['barang' => 'Barang jadi tidak bisa diedit dari master barang.']);
+        }
+
         $barang->update($this->validatedData($request, $barang, false));
 
         return redirect()
@@ -211,16 +223,11 @@ class BarangController extends Controller
             return $data;
         }
 
-        $fields = ['harga_beli', 'harga_jual'];
+        $data['harga_beli'] = 0;
+        $data['harga_jual'] = 0;
 
         if ($includeStock) {
-            $fields[] = 'stok';
-        }
-
-        foreach ($fields as $field) {
-            if (! array_key_exists($field, $data) || trim((string) $data[$field]) === '') {
-                $data[$field] = 0;
-            }
+            $data['stok'] = 0;
         }
 
         return $data;

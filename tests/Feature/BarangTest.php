@@ -54,7 +54,7 @@ class BarangTest extends TestCase
         $this->post('/barang', [
             'kode_barang' => 'NON001',
             'nama_barang' => 'Barang Baru',
-            'jenis_barang' => 'barang_jadi',
+            'jenis_barang' => 'bahan_baku',
             'satuan' => 'm2',
             'harga_beli' => 1000,
             'harga_jual' => 1500,
@@ -64,21 +64,21 @@ class BarangTest extends TestCase
         $this->assertDatabaseHas('barangs', [
             'kode_barang' => 'NON001',
             'nama_barang' => 'Barang Baru',
-            'jenis_barang' => 'barang_jadi',
+            'jenis_barang' => 'bahan_baku',
             'satuan' => 'm2',
         ]);
     }
 
-    public function test_finished_goods_can_be_created_with_empty_prices_and_stock(): void
+    public function test_finished_goods_are_created_with_zero_prices_and_stock(): void
     {
         $this->post('/barang', [
             'kode_barang' => 'BJ001',
             'nama_barang' => 'Tembok 1 m2',
             'jenis_barang' => 'barang_jadi',
             'satuan' => 'm2',
-            'harga_beli' => '',
-            'harga_jual' => '',
-            'stok' => '',
+            'harga_beli' => 1000,
+            'harga_jual' => 1500,
+            'stok' => 2,
         ])->assertRedirect('/barang');
 
         $this->assertDatabaseHas('barangs', [
@@ -89,6 +89,43 @@ class BarangTest extends TestCase
             'harga_beli' => 0,
             'harga_jual' => 0,
             'stok' => 0,
+        ]);
+    }
+
+    public function test_finished_goods_cannot_be_edited_from_master_barang(): void
+    {
+        $barang = Barang::create([
+            'kode_barang' => 'BJ001',
+            'nama_barang' => 'Tembok 1 m2',
+            'jenis_barang' => 'barang_jadi',
+            'satuan' => 'm2',
+            'harga_beli' => 40000,
+            'harga_jual' => 45000,
+            'stok' => 10,
+        ]);
+
+        $this->get("/barang/{$barang->id}/edit")
+            ->assertRedirect('/barang')
+            ->assertSessionHasErrors('barang');
+
+        $this->put("/barang/{$barang->id}", [
+            'kode_barang' => 'BJ999',
+            'nama_barang' => 'Tembok Edit',
+            'jenis_barang' => 'barang_jadi',
+            'satuan' => 'pcs',
+            'harga_beli' => 1,
+            'harga_jual' => 1,
+            'stok' => 1,
+        ])->assertRedirect('/barang')
+            ->assertSessionHasErrors('barang');
+
+        $this->assertDatabaseHas('barangs', [
+            'id' => $barang->id,
+            'kode_barang' => 'BJ001',
+            'nama_barang' => 'Tembok 1 m2',
+            'harga_beli' => 40000,
+            'harga_jual' => 45000,
+            'stok' => 10,
         ]);
     }
 
@@ -130,7 +167,7 @@ class BarangTest extends TestCase
             ['kode_barang', 'nama_barang', 'harga_beli', 'harga_jual', 'stok', 'jenis'],
             ['AAA13', 'BATA MERAH 2', 500, 1500, 1000, 'barang baku'],
             ['AAA14', 'SEMEN PUTIH 2', 20000, 30000, 30, 'bahan baku'],
-            ['AAA15', 'BATAKO', '', '', '', 'barang jadi'],
+            ['AAA15', 'BATAKO', 500, 1500, 1000, 'barang jadi'],
         ]);
         (new Xlsx($spreadsheet))->save($path);
 

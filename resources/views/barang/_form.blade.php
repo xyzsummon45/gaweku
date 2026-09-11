@@ -24,10 +24,8 @@
             @foreach ([
                 'bahan_baku' => 'Bahan Baku',
                 'barang_jadi' => 'Barang Jadi',
-                'barang_dagang' => 'Barang Dagang',
-                'bahan_penolong' => 'Bahan Penolong',
             ] as $value => $label)
-                <option value="{{ $value }}" @selected(old('jenis_barang', $barang->jenis_barang ?: 'barang_dagang') === $value)>{{ $label }}</option>
+                <option value="{{ $value }}" @selected(old('jenis_barang', $barang->jenis_barang ?: 'bahan_baku') === $value)>{{ $label }}</option>
             @endforeach
         </select>
         @error('jenis_barang')

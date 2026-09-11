@@ -98,7 +98,7 @@ class FormulaController extends Controller
     {
         return [
             'formula' => $formula,
-            'barangBahans' => Barang::whereIn('jenis_barang', ['bahan_baku', 'bahan_penolong', 'barang_dagang'])->orderBy('nama_barang')->get(),
+            'barangBahans' => Barang::where('jenis_barang', 'bahan_baku')->orderBy('nama_barang')->get(),
         ];
     }
 
@@ -123,7 +123,7 @@ class FormulaController extends Controller
                 'required',
                 'integer',
                 'distinct',
-                Rule::exists('barangs', 'id')->whereIn('jenis_barang', ['bahan_baku', 'bahan_penolong', 'barang_dagang']),
+                Rule::exists('barangs', 'id')->where('jenis_barang', 'bahan_baku'),
             ],
             'qty' => ['required', 'array', 'min:1'],
             'qty.*' => ['required', 'numeric', 'min:0.001'],

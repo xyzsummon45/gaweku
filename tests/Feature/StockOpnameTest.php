@@ -57,7 +57,7 @@ class StockOpnameTest extends TestCase
         Barang::create([
             'kode_barang' => 'KAS123',
             'nama_barang' => 'PIPA PVC 80cm',
-            'jenis_barang' => 'barang_dagang',
+            'jenis_barang' => 'bahan_baku',
             'satuan' => 'pcs',
             'harga_beli' => 17000,
             'harga_jual' => 20000,

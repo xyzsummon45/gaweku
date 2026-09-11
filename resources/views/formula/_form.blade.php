@@ -65,7 +65,7 @@
 
 <section class="panel cashier-panel">
     <label>
-        <span>Bahan Baku / Penolong / Dagang</span>
+        <span>Bahan Baku</span>
         <select id="bahan-select">
             <option value="">Pilih bahan</option>
             @foreach ($barangBahans as $barang)

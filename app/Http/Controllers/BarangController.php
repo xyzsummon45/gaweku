@@ -125,8 +125,8 @@ class BarangController extends Controller
             $data = [
                 'kode_barang' => trim((string) $row[$columns['kode_barang']]),
                 'nama_barang' => trim((string) $row[$columns['nama_barang']]),
-                'jenis_barang' => $this->normalizeJenisBarang($row[$columns['jenis_barang'] ?? null] ?? 'barang_dagang'),
-                'satuan' => $this->normalizeSatuan($row[$columns['satuan'] ?? null] ?? 'pcs'),
+                'jenis_barang' => $this->normalizeJenisBarang($this->optionalExcelValue($row, $columns, ['jenis', 'jenis_barang'])),
+                'satuan' => $this->normalizeSatuan($this->optionalExcelValue($row, $columns, ['satuan'])),
                 'harga_beli' => $this->normalizeNumber($row[$columns['harga_beli']]),
                 'harga_jual' => $this->normalizeNumber($row[$columns['harga_jual']]),
                 'stok' => $this->normalizeNumber($row[$columns['stok']]),
@@ -183,7 +183,7 @@ class BarangController extends Controller
         $rules = [
             'kode_barang' => $codeRules,
             'nama_barang' => ['required', 'string', 'max:255'],
-            'jenis_barang' => ['required', 'string', 'in:bahan_baku,barang_jadi,barang_dagang,bahan_penolong'],
+            'jenis_barang' => ['required', 'string', 'in:bahan_baku,barang_jadi'],
             'satuan' => ['required', 'string', 'max:30'],
             'harga_beli' => ['required', 'numeric', 'min:0'],
             'harga_jual' => ['required', 'numeric', 'min:0'],
@@ -236,9 +236,11 @@ class BarangController extends Controller
         $value = strtolower(trim((string) $value));
         $value = str_replace([' ', '-'], '_', $value);
 
-        return in_array($value, ['bahan_baku', 'barang_jadi', 'barang_dagang', 'bahan_penolong'], true)
-            ? $value
-            : 'barang_dagang';
+        return match ($value) {
+            'barang_jadi', 'finished_good', 'finished_goods' => 'barang_jadi',
+            'bahan_baku', 'barang_baku', 'raw_material', 'raw_materials', '' => 'bahan_baku',
+            default => 'bahan_baku',
+        };
     }
 
     private function normalizeSatuan(mixed $value): string
@@ -246,5 +248,16 @@ class BarangController extends Controller
         $value = trim((string) $value);
 
         return $value !== '' ? $value : 'pcs';
+    }
+
+    private function optionalExcelValue(array $row, array $columns, array $names): mixed
+    {
+        foreach ($names as $name) {
+            if (array_key_exists($name, $columns)) {
+                return $row[$columns[$name]] ?? null;
+            }
+        }
+
+        return null;
     }
 }

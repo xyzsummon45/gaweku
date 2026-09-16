@@ -12,14 +12,20 @@ class TransaksiItem extends Model
         'kode_barang',
         'nama_barang',
         'harga_jual',
+        'harga_modal',
         'qty',
         'subtotal',
+        'subtotal_modal',
+        'laba_kotor',
     ];
 
     protected $casts = [
         'harga_jual' => 'decimal:2',
+        'harga_modal' => 'decimal:2',
         'qty' => 'decimal:3',
         'subtotal' => 'decimal:2',
+        'subtotal_modal' => 'decimal:2',
+        'laba_kotor' => 'decimal:2',
     ];
 
     public function transaksi()

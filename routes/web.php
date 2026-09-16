@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\FormulaController;
 use App\Http\Controllers\KasController;
+use App\Http\Controllers\LaporanPenjualanController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\ProduksiController;
 use App\Http\Controllers\SupplierController;
@@ -29,6 +30,9 @@ Route::resource('supplier', SupplierController::class)->except('show');
 
 Route::get('/kas', [KasController::class, 'index'])->name('kas.index');
 Route::post('/kas', [KasController::class, 'store'])->name('kas.store');
+
+Route::get('/laporan/penjualan', [LaporanPenjualanController::class, 'index'])->name('laporan.penjualan');
+Route::get('/laporan/penjualan/pdf', [LaporanPenjualanController::class, 'downloadPdf'])->name('laporan.penjualan.pdf');
 
 Route::get('/pembelian/autocomplete-barang', [PembelianController::class, 'autocompleteBarang'])->name('pembelian.autocomplete-barang');
 Route::post('/pembelian/{pembelian}/bayar', [PembelianController::class, 'bayar'])->name('pembelian.bayar');

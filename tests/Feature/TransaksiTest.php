@@ -50,7 +50,10 @@ class TransaksiTest extends TestCase
             'transaksi_id' => $transaksi->id,
             'barang_id' => $barang->id,
             'qty' => 0.5,
+            'harga_modal' => 17000,
             'subtotal' => 10000,
+            'subtotal_modal' => 8500,
+            'laba_kotor' => 1500,
         ]);
         $this->assertSame('9.500', $barang->fresh()->stok);
         $this->assertSame('10000.00', KasAccount::where('kode', KasAccount::KAS_BANK)->first()->saldo);

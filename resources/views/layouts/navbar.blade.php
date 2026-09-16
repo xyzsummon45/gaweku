@@ -10,6 +10,7 @@
             <a class="{{ request()->routeIs('pembelian.*') ? 'active' : '' }}" href="{{ route('pembelian.index') }}">Pembelian</a>
             <a class="{{ request()->routeIs('kas.*') ? 'active' : '' }}" href="{{ route('kas.index') }}">Kas</a>
             <a class="{{ request()->routeIs('transaksi.*') ? 'active' : '' }}" href="{{ route('transaksi.index') }}">Transaksi</a>
+            <a class="{{ request()->routeIs('laporan.*') ? 'active' : '' }}" href="{{ route('laporan.penjualan') }}">Laporan</a>
         </div>
     </div>
 </nav>

@@ -90,14 +90,18 @@ class TransaksiController extends Controller
             foreach ($groupedItems as $barangId => $qty) {
                 $barang = $barangs->get($barangId);
                 $subtotal = $barang->harga_jual * $qty;
+                $subtotalModal = $barang->harga_beli * $qty;
 
                 $transaksi->items()->create([
                     'barang_id' => $barang->id,
                     'kode_barang' => $barang->kode_barang,
                     'nama_barang' => $barang->nama_barang,
                     'harga_jual' => $barang->harga_jual,
+                    'harga_modal' => $barang->harga_beli,
                     'qty' => $qty,
                     'subtotal' => $subtotal,
+                    'subtotal_modal' => $subtotalModal,
+                    'laba_kotor' => $subtotal - $subtotalModal,
                 ]);
 
                 $barang->decrement('stok', $qty);

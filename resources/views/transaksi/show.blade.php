@@ -35,6 +35,14 @@
                 <span>Total</span>
                 <strong>Rp {{ number_format($transaksi->total, 0, ',', '.') }}</strong>
             </div>
+            <div>
+                <span>Total Modal</span>
+                <strong>Rp {{ number_format($transaksi->items->sum('subtotal_modal'), 0, ',', '.') }}</strong>
+            </div>
+            <div>
+                <span>Laba Kotor</span>
+                <strong>Rp {{ number_format($transaksi->items->sum('laba_kotor'), 0, ',', '.') }}</strong>
+            </div>
         </section>
 
         <section class="panel table-wrap">
@@ -44,8 +52,10 @@
                         <th>Kode</th>
                         <th>Nama Barang</th>
                         <th class="number">Harga</th>
+                        <th class="number">Modal</th>
                         <th class="number">Qty</th>
                         <th class="number">Subtotal</th>
+                        <th class="number">Laba Kotor</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,8 +64,10 @@
                             <td>{{ $item->kode_barang }}</td>
                             <td>{{ $item->nama_barang }}</td>
                             <td class="number">Rp {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                            <td class="number">Rp {{ number_format($item->harga_modal, 0, ',', '.') }}</td>
                             <td class="number">{{ rtrim(rtrim(number_format($item->qty, 3, ',', '.'), '0'), ',') }}</td>
                             <td class="number">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                            <td class="number">Rp {{ number_format($item->laba_kotor, 0, ',', '.') }}</td>
                         </tr>
                     @endforeach
                 </tbody>

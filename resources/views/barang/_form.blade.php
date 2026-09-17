@@ -63,13 +63,13 @@
             type="number"
             name="stok"
             id="stok"
-            value="{{ old('stok', $barang->stok) }}"
+            value="{{ $isEdit ? old('stok', $barang->stok) : 0 }}"
             min="0"
             step="0.001"
             placeholder="0"
-            @readonly($isEdit)
-            @required(! $isEdit)
+            readonly
         >
+        <small>Stok berubah lewat Pembelian, Produksi, atau Stock Opname.</small>
         @error('stok')
             <small>{{ $message }}</small>
         @enderror
@@ -86,7 +86,6 @@
     const productionFields = [
         document.getElementById('harga-beli'),
         document.getElementById('harga-jual'),
-        document.getElementById('stok'),
     ];
 
     jenisBarang.addEventListener('change', syncProductionFields);

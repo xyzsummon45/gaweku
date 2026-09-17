@@ -49,7 +49,7 @@ class BarangTest extends TestCase
             ->assertDontSee('SEMEN PUTIH');
     }
 
-    public function test_barang_can_be_created(): void
+    public function test_barang_can_be_created_with_zero_stock(): void
     {
         $this->post('/barang', [
             'kode_barang' => 'NON001',
@@ -66,6 +66,7 @@ class BarangTest extends TestCase
             'nama_barang' => 'Barang Baru',
             'jenis_barang' => 'bahan_baku',
             'satuan' => 'm2',
+            'stok' => 0,
         ]);
     }
 
@@ -184,7 +185,7 @@ class BarangTest extends TestCase
         $this->assertDatabaseHas('barangs', [
             'kode_barang' => 'AAA13',
             'jenis_barang' => 'bahan_baku',
-            'stok' => 1000,
+            'stok' => 0,
         ]);
         $this->assertDatabaseHas('barangs', [
             'kode_barang' => 'AAA15',

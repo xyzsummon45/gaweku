@@ -49,7 +49,10 @@ class BarangController extends Controller
 
     public function store(Request $request)
     {
-        Barang::create($this->validatedData($request));
+        $data = $this->validatedData($request, includeStock: false);
+        $data['stok'] = 0;
+
+        Barang::create($data);
 
         return redirect()
             ->route('barang.index')
@@ -120,7 +123,7 @@ class BarangController extends Controller
         );
 
         $columns = array_flip($header);
-        $requiredColumns = ['kode_barang', 'nama_barang', 'harga_beli', 'harga_jual', 'stok'];
+        $requiredColumns = ['kode_barang', 'nama_barang', 'harga_beli', 'harga_jual'];
         $missingColumns = array_diff($requiredColumns, array_keys($columns));
 
         if ($missingColumns !== []) {
@@ -141,7 +144,7 @@ class BarangController extends Controller
                 'satuan' => $this->normalizeSatuan($this->optionalExcelValue($row, $columns, ['satuan'])),
                 'harga_beli' => $this->normalizeNumber($row[$columns['harga_beli']]),
                 'harga_jual' => $this->normalizeNumber($row[$columns['harga_jual']]),
-                'stok' => $this->normalizeNumber($row[$columns['stok']]),
+                'stok' => 0,
             ];
             $data = $this->withManufacturedItemDefaults($data);
 

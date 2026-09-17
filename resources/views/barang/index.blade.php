@@ -41,7 +41,7 @@
         <section class="panel toolbar">
             <div>
                 <strong>Import Excel</strong>
-                <p>Header wajib: kode_barang, nama_barang, harga_beli, harga_jual, stok. Opsional: jenis, satuan.</p>
+                <p>Header wajib: kode_barang, nama_barang, harga_beli, harga_jual. Opsional: jenis, satuan. Stok otomatis 0 dan masuk lewat pembelian/produksi/opname.</p>
             </div>
             <form class="import-form" method="POST" action="{{ route('barang.import') }}" enctype="multipart/form-data">
                 @csrf

@@ -44,6 +44,7 @@
     <label>
         <span>Harga Beli</span>
         <input type="number" name="harga_beli" id="harga-beli" value="{{ old('harga_beli', $barang->harga_beli) }}" min="0" step="0.01" placeholder="0" required>
+        <small class="production-note">Barang jadi memakai HPP dari produksi.</small>
         @error('harga_beli')
             <small>{{ $message }}</small>
         @enderror
@@ -52,6 +53,7 @@
     <label>
         <span>Harga Jual</span>
         <input type="number" name="harga_jual" id="harga-jual" value="{{ old('harga_jual', $barang->harga_jual) }}" min="0" step="0.01" placeholder="0" required>
+        <small class="production-note">Harga jual barang jadi diterapkan dari detail produksi.</small>
         @error('harga_jual')
             <small>{{ $message }}</small>
         @enderror
@@ -87,6 +89,7 @@
         document.getElementById('harga-beli'),
         document.getElementById('harga-jual'),
     ];
+    const productionNotes = document.querySelectorAll('.production-note');
 
     jenisBarang.addEventListener('change', syncProductionFields);
     syncProductionFields();
@@ -95,11 +98,12 @@
         const isBarangJadi = jenisBarang.value === 'barang_jadi';
 
         productionFields.forEach((field) => {
-            if (field.readOnly) {
-                return;
-            }
+            field.value = isBarangJadi ? '0' : field.value;
+            field.readOnly = isBarangJadi;
+        });
 
-            field.required = ! isBarangJadi;
+        productionNotes.forEach((note) => {
+            note.hidden = ! isBarangJadi;
         });
     }
 </script>

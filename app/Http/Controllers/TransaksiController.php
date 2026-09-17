@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use App\Models\KasAccount;
 use App\Models\KasMutation;
+use App\Models\StokMutasi;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -104,7 +105,24 @@ class TransaksiController extends Controller
                     'laba_kotor' => $subtotal - $subtotalModal,
                 ]);
 
-                $barang->decrement('stok', $qty);
+                $stokSebelum = (float) $barang->stok;
+                $stokSesudah = $stokSebelum - $qty;
+
+                $barang->update(['stok' => $stokSesudah]);
+
+                StokMutasi::create([
+                    'barang_id' => $barang->id,
+                    'tanggal' => $transaksi->tanggal,
+                    'tipe' => 'penjualan',
+                    'qty_masuk' => 0,
+                    'qty_keluar' => $qty,
+                    'stok_sebelum' => $stokSebelum,
+                    'stok_sesudah' => $stokSesudah,
+                    'referensi_tipe' => 'transaksi',
+                    'referensi_id' => $transaksi->id,
+                    'catatan' => "Penjualan {$transaksi->kode_transaksi}",
+                ]);
+
                 $total += $subtotal;
             }
 

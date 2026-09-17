@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\FormulaController;
 use App\Http\Controllers\KasController;
+use App\Http\Controllers\KartuStokController;
 use App\Http\Controllers\LaporanPenjualanController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\ProduksiController;
@@ -25,6 +26,9 @@ Route::resource('produksi', ProduksiController::class)->only(['index', 'create',
 
 Route::get('/stock-opname/autocomplete-barang', [StockOpnameController::class, 'autocompleteBarang'])->name('stock-opname.autocomplete-barang');
 Route::resource('stock-opname', StockOpnameController::class)->only(['index', 'create', 'store']);
+
+Route::get('/kartu-stok', [KartuStokController::class, 'index'])->name('kartu-stok.index');
+Route::get('/kartu-stok/autocomplete-barang', [KartuStokController::class, 'autocompleteBarang'])->name('kartu-stok.autocomplete-barang');
 
 Route::resource('supplier', SupplierController::class)->except('show');
 

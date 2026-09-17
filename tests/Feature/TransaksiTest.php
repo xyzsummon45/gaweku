@@ -62,6 +62,16 @@ class TransaksiTest extends TestCase
             'jenis' => 'pemasukan',
             'jumlah' => 10000,
         ]);
+        $this->assertDatabaseHas('stok_mutasis', [
+            'barang_id' => $barang->id,
+            'tipe' => 'penjualan',
+            'qty_masuk' => 0,
+            'qty_keluar' => 0.5,
+            'stok_sebelum' => 10,
+            'stok_sesudah' => 9.5,
+            'referensi_tipe' => 'transaksi',
+            'referensi_id' => $transaksi->id,
+        ]);
     }
 
     public function test_transaction_history_can_be_filtered_by_date(): void

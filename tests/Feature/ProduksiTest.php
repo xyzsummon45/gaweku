@@ -119,6 +119,22 @@ class ProduksiTest extends TestCase
         $this->assertSame('barang_jadi', $tembok->fresh()->jenis_barang);
         $this->assertSame('40200.00', $tembok->fresh()->harga_beli);
         $this->assertSame('50000.00', $tembok->fresh()->harga_jual);
+        $this->assertDatabaseHas('stok_mutasis', [
+            'barang_id' => $bata->id,
+            'tipe' => 'produksi_bahan',
+            'qty_keluar' => 50,
+            'stok_sebelum' => 100,
+            'stok_sesudah' => 50,
+            'referensi_tipe' => 'produksi',
+        ]);
+        $this->assertDatabaseHas('stok_mutasis', [
+            'barang_id' => $tembok->id,
+            'tipe' => 'produksi_hasil',
+            'qty_masuk' => 2.5,
+            'stok_sebelum' => 0,
+            'stok_sesudah' => 2.5,
+            'referensi_tipe' => 'produksi',
+        ]);
     }
 
     public function test_recommended_selling_price_can_be_applied_to_finished_goods(): void

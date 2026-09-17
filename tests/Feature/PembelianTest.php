@@ -56,6 +56,16 @@ class PembelianTest extends TestCase
         ]);
         $this->assertSame('12.500', $barang->fresh()->stok);
         $this->assertSame('2000.00', $barang->fresh()->harga_beli);
+        $this->assertDatabaseHas('stok_mutasis', [
+            'barang_id' => $barang->id,
+            'tipe' => 'pembelian',
+            'qty_masuk' => 2.5,
+            'qty_keluar' => 0,
+            'stok_sebelum' => 10,
+            'stok_sesudah' => 12.5,
+            'referensi_tipe' => 'pembelian',
+            'referensi_id' => $pembelian->id,
+        ]);
     }
 
     public function test_supplier_invoice_can_be_paid_from_kas(): void

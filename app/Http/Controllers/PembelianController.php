@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\KasAccount;
 use App\Models\KasMutation;
 use App\Models\Pembelian;
+use App\Models\StokMutasi;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -140,8 +141,27 @@ class PembelianController extends Controller
                     'subtotal' => $subtotal,
                 ]);
 
-                $barang->increment('stok', $qty);
-                $barang->update(['harga_beli' => $hargaBeli]);
+                $stokSebelum = (float) $barang->stok;
+                $stokSesudah = $stokSebelum + $qty;
+
+                $barang->update([
+                    'stok' => $stokSesudah,
+                    'harga_beli' => $hargaBeli,
+                ]);
+
+                StokMutasi::create([
+                    'barang_id' => $barang->id,
+                    'tanggal' => $pembelian->tanggal,
+                    'tipe' => 'pembelian',
+                    'qty_masuk' => $qty,
+                    'qty_keluar' => 0,
+                    'stok_sebelum' => $stokSebelum,
+                    'stok_sesudah' => $stokSesudah,
+                    'referensi_tipe' => 'pembelian',
+                    'referensi_id' => $pembelian->id,
+                    'catatan' => "Pembelian invoice {$pembelian->nomor_invoice}",
+                ]);
+
                 $total += $subtotal;
             }
 

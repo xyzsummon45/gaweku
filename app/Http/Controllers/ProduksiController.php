@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use App\Models\Formula;
 use App\Models\Produksi;
+use App\Models\StokMutasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -176,7 +177,24 @@ class ProduksiController extends Controller
                     'subtotal' => $subtotal,
                 ]);
 
-                $barang->decrement('stok', $qtyPakai);
+                $stokSebelum = (float) $barang->stok;
+                $stokSesudah = $stokSebelum - $qtyPakai;
+
+                $barang->update(['stok' => $stokSesudah]);
+
+                StokMutasi::create([
+                    'barang_id' => $barang->id,
+                    'tanggal' => $produksi->tanggal,
+                    'tipe' => 'produksi_bahan',
+                    'qty_masuk' => 0,
+                    'qty_keluar' => $qtyPakai,
+                    'stok_sebelum' => $stokSebelum,
+                    'stok_sesudah' => $stokSesudah,
+                    'referensi_tipe' => 'produksi',
+                    'referensi_id' => $produksi->id,
+                    'catatan' => "Bahan dipakai produksi {$produksi->kode_produksi}",
+                ]);
+
                 $totalBiaya += $subtotal;
             }
 
@@ -198,7 +216,23 @@ class ProduksiController extends Controller
                 'satuan' => $formula->satuan_hasil,
                 'harga_beli' => $hpp,
             ]);
-            $barangHasil->increment('stok', (float) $data['qty_produksi']);
+            $qtyHasil = (float) $data['qty_produksi'];
+            $stokSebelumHasil = (float) $barangHasil->stok;
+            $stokSesudahHasil = $stokSebelumHasil + $qtyHasil;
+            $barangHasil->update(['stok' => $stokSesudahHasil]);
+
+            StokMutasi::create([
+                'barang_id' => $barangHasil->id,
+                'tanggal' => $produksi->tanggal,
+                'tipe' => 'produksi_hasil',
+                'qty_masuk' => $qtyHasil,
+                'qty_keluar' => 0,
+                'stok_sebelum' => $stokSebelumHasil,
+                'stok_sesudah' => $stokSesudahHasil,
+                'referensi_tipe' => 'produksi',
+                'referensi_id' => $produksi->id,
+                'catatan' => "Hasil produksi {$produksi->kode_produksi}",
+            ]);
 
             $produksi->update([
                 'total_biaya' => $totalBiaya,

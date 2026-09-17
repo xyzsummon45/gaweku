@@ -17,7 +17,7 @@ class KasController extends Controller
             'mutations' => KasMutation::with(['kasAccount', 'relatedKasAccount', 'pembelian', 'transaksi'])
                 ->latest('tanggal')
                 ->latest('id')
-                ->paginate(15),
+                ->paginate(10),
         ]);
     }
 

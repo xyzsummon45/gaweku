@@ -38,7 +38,6 @@ class BarangTest extends TestCase
         $this->get('/barang?q=semen')
             ->assertOk()
             ->assertSee('SEMEN PUTIH')
-            ->assertSee('Bahan Baku')
             ->assertSee('kg')
             ->assertSee('24,3')
             ->assertDontSee('PIPA PVC 80cm');
@@ -67,66 +66,6 @@ class BarangTest extends TestCase
             'jenis_barang' => 'bahan_baku',
             'satuan' => 'm2',
             'stok' => 0,
-        ]);
-    }
-
-    public function test_finished_goods_are_created_with_zero_prices_and_stock(): void
-    {
-        $this->post('/barang', [
-            'kode_barang' => 'BJ001',
-            'nama_barang' => 'Tembok 1 m2',
-            'jenis_barang' => 'barang_jadi',
-            'satuan' => 'm2',
-            'harga_beli' => 1000,
-            'harga_jual' => 1500,
-            'stok' => 2,
-        ])->assertRedirect('/barang');
-
-        $this->assertDatabaseHas('barangs', [
-            'kode_barang' => 'BJ001',
-            'nama_barang' => 'Tembok 1 m2',
-            'jenis_barang' => 'barang_jadi',
-            'satuan' => 'm2',
-            'harga_beli' => 0,
-            'harga_jual' => 0,
-            'stok' => 0,
-        ]);
-    }
-
-    public function test_finished_goods_cannot_be_edited_from_master_barang(): void
-    {
-        $barang = Barang::create([
-            'kode_barang' => 'BJ001',
-            'nama_barang' => 'Tembok 1 m2',
-            'jenis_barang' => 'barang_jadi',
-            'satuan' => 'm2',
-            'harga_beli' => 40000,
-            'harga_jual' => 45000,
-            'stok' => 10,
-        ]);
-
-        $this->get("/barang/{$barang->id}/edit")
-            ->assertRedirect('/barang')
-            ->assertSessionHasErrors('barang');
-
-        $this->put("/barang/{$barang->id}", [
-            'kode_barang' => 'BJ999',
-            'nama_barang' => 'Tembok Edit',
-            'jenis_barang' => 'barang_jadi',
-            'satuan' => 'pcs',
-            'harga_beli' => 1,
-            'harga_jual' => 1,
-            'stok' => 1,
-        ])->assertRedirect('/barang')
-            ->assertSessionHasErrors('barang');
-
-        $this->assertDatabaseHas('barangs', [
-            'id' => $barang->id,
-            'kode_barang' => 'BJ001',
-            'nama_barang' => 'Tembok 1 m2',
-            'harga_beli' => 40000,
-            'harga_jual' => 45000,
-            'stok' => 10,
         ]);
     }
 
@@ -159,7 +98,7 @@ class BarangTest extends TestCase
         $this->assertSame('21000.00', $barang->harga_jual);
     }
 
-    public function test_barang_import_accepts_simple_jenis_header(): void
+    public function test_barang_import_ignores_jenis_header_and_defaults_stock_to_zero(): void
     {
         $path = tempnam(sys_get_temp_dir(), 'barang-import-').'.xlsx';
         $spreadsheet = new Spreadsheet();
@@ -189,9 +128,9 @@ class BarangTest extends TestCase
         ]);
         $this->assertDatabaseHas('barangs', [
             'kode_barang' => 'AAA15',
-            'jenis_barang' => 'barang_jadi',
-            'harga_beli' => 0,
-            'harga_jual' => 0,
+            'jenis_barang' => 'bahan_baku',
+            'harga_beli' => 500,
+            'harga_jual' => 1500,
             'stok' => 0,
         ]);
     }

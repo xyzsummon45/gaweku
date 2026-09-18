@@ -19,21 +19,6 @@
     </label>
 
     <label>
-        <span>Jenis Barang</span>
-        <select name="jenis_barang" id="jenis-barang" required>
-            @foreach ([
-                'bahan_baku' => 'Bahan Baku',
-                'barang_jadi' => 'Barang Jadi',
-            ] as $value => $label)
-                <option value="{{ $value }}" @selected(old('jenis_barang', $barang->jenis_barang ?: 'bahan_baku') === $value)>{{ $label }}</option>
-            @endforeach
-        </select>
-        @error('jenis_barang')
-            <small>{{ $message }}</small>
-        @enderror
-    </label>
-
-    <label>
         <span>Satuan</span>
         <input type="text" name="satuan" value="{{ old('satuan', $barang->satuan ?: 'pcs') }}" placeholder="pcs, kg, sak, m2" required>
         @error('satuan')
@@ -43,8 +28,7 @@
 
     <label>
         <span>Harga Beli</span>
-        <input type="number" name="harga_beli" id="harga-beli" value="{{ old('harga_beli', $barang->harga_beli) }}" min="0" step="0.01" placeholder="0" required>
-        <small class="production-note">Barang jadi memakai HPP dari produksi.</small>
+        <input type="number" name="harga_beli" value="{{ old('harga_beli', $barang->harga_beli) }}" min="0" step="0.01" placeholder="0" required>
         @error('harga_beli')
             <small>{{ $message }}</small>
         @enderror
@@ -52,8 +36,7 @@
 
     <label>
         <span>Harga Jual</span>
-        <input type="number" name="harga_jual" id="harga-jual" value="{{ old('harga_jual', $barang->harga_jual) }}" min="0" step="0.01" placeholder="0" required>
-        <small class="production-note">Harga jual barang jadi diterapkan dari detail produksi.</small>
+        <input type="number" name="harga_jual" value="{{ old('harga_jual', $barang->harga_jual) }}" min="0" step="0.01" placeholder="0" required>
         @error('harga_jual')
             <small>{{ $message }}</small>
         @enderror
@@ -71,7 +54,7 @@
             placeholder="0"
             readonly
         >
-        <small>Stok berubah lewat Pembelian, Produksi, atau Stock Opname.</small>
+        <small>Stok berubah lewat Pembelian, Transaksi, atau Stock Opname.</small>
         @error('stok')
             <small>{{ $message }}</small>
         @enderror
@@ -82,28 +65,3 @@
     <button type="submit">{{ $submit }}</button>
     <a href="{{ route('barang.index') }}">Batal</a>
 </div>
-
-<script>
-    const jenisBarang = document.getElementById('jenis-barang');
-    const productionFields = [
-        document.getElementById('harga-beli'),
-        document.getElementById('harga-jual'),
-    ];
-    const productionNotes = document.querySelectorAll('.production-note');
-
-    jenisBarang.addEventListener('change', syncProductionFields);
-    syncProductionFields();
-
-    function syncProductionFields() {
-        const isBarangJadi = jenisBarang.value === 'barang_jadi';
-
-        productionFields.forEach((field) => {
-            field.value = isBarangJadi ? '0' : field.value;
-            field.readOnly = isBarangJadi;
-        });
-
-        productionNotes.forEach((note) => {
-            note.hidden = ! isBarangJadi;
-        });
-    }
-</script>

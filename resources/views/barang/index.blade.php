@@ -30,7 +30,7 @@
             <form class="search-form" method="GET" action="{{ route('barang.index') }}">
                 <label>
                     <span>Cari Barang</span>
-                    <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari kode, nama, jenis, atau satuan">
+                    <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari kode, nama, atau satuan">
                 </label>
 
                 <button type="submit">Cari</button>
@@ -41,7 +41,7 @@
         <section class="panel toolbar">
             <div>
                 <strong>Import Excel</strong>
-                <p>Header wajib: kode_barang, nama_barang, harga_beli, harga_jual. Opsional: jenis, satuan. Stok otomatis 0 dan masuk lewat pembelian/produksi/opname.</p>
+                <p>Header wajib: kode_barang, nama_barang, harga_beli, harga_jual. Opsional: satuan. Stok otomatis 0 dan masuk lewat pembelian/transaksi/opname.</p>
             </div>
             <form class="import-form" method="POST" action="{{ route('barang.import') }}" enctype="multipart/form-data">
                 @csrf
@@ -56,7 +56,6 @@
                     <tr>
                         <th>Kode</th>
                         <th>Nama Barang</th>
-                        <th>Jenis</th>
                         <th>Satuan</th>
                         <th class="number">Harga Beli</th>
                         <th class="number">Harga Jual</th>
@@ -69,24 +68,19 @@
                         <tr>
                             <td>{{ $barang->kode_barang }}</td>
                             <td>{{ $barang->nama_barang }}</td>
-                            <td>{{ ucwords(str_replace('_', ' ', $barang->jenis_barang)) }}</td>
                             <td>{{ $barang->satuan }}</td>
                             <td class="number">Rp {{ number_format($barang->harga_beli, 0, ',', '.') }}</td>
                             <td class="number">Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}</td>
                             <td class="number">{{ rtrim(rtrim(number_format($barang->stok, 3, ',', '.'), '0'), ',') }}</td>
                             <td>
                                 <div class="row-actions">
-                                    @if ($barang->jenis_barang !== 'barang_jadi')
-                                        <a class="secondary-button" href="{{ route('barang.edit', $barang) }}">Edit</a>
-                                    @else
-                                        <span class="secondary-button">Terkunci</span>
-                                    @endif
+                                    <a class="secondary-button" href="{{ route('barang.edit', $barang) }}">Edit</a>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td class="empty" colspan="8">Belum ada data barang.</td>
+                            <td class="empty" colspan="7">Belum ada data barang.</td>
                         </tr>
                     @endforelse
                 </tbody>

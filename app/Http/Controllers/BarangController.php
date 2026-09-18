@@ -16,15 +16,12 @@ class BarangController extends Controller
         ]);
 
         $keyword = trim($filters['q'] ?? '');
-        $normalizedKeyword = str_replace([' ', '-'], '_', strtolower($keyword));
 
         $barangs = Barang::query()
-            ->when($keyword !== '', function ($query) use ($keyword, $normalizedKeyword) {
-                $query->where(function ($query) use ($keyword, $normalizedKeyword) {
+            ->when($keyword !== '', function ($query) use ($keyword) {
+                $query->where(function ($query) use ($keyword) {
                     $query->where('kode_barang', 'like', "%{$keyword}%")
                         ->orWhere('nama_barang', 'like', "%{$keyword}%")
-                        ->orWhere('jenis_barang', 'like', "%{$keyword}%")
-                        ->orWhere('jenis_barang', 'like', "%{$normalizedKeyword}%")
                         ->orWhere('satuan', 'like', "%{$keyword}%");
                 });
             })
@@ -61,12 +58,6 @@ class BarangController extends Controller
 
     public function edit(Barang $barang)
     {
-        if ($barang->jenis_barang === 'barang_jadi') {
-            return redirect()
-                ->route('barang.index')
-                ->withErrors(['barang' => 'Barang jadi tidak bisa diedit dari master barang. Gunakan produksi untuk HPP/stok dan tombol apply harga jual untuk harga jual.']);
-        }
-
         return view('barang.edit', [
             'barang' => $barang,
         ]);
@@ -74,12 +65,6 @@ class BarangController extends Controller
 
     public function update(Request $request, Barang $barang)
     {
-        if ($barang->jenis_barang === 'barang_jadi') {
-            return redirect()
-                ->route('barang.index')
-                ->withErrors(['barang' => 'Barang jadi tidak bisa diedit dari master barang.']);
-        }
-
         $barang->update($this->validatedData($request, $barang, false));
 
         return redirect()
@@ -140,13 +125,12 @@ class BarangController extends Controller
             $data = [
                 'kode_barang' => trim((string) $row[$columns['kode_barang']]),
                 'nama_barang' => trim((string) $row[$columns['nama_barang']]),
-                'jenis_barang' => $this->normalizeJenisBarang($this->optionalExcelValue($row, $columns, ['jenis', 'jenis_barang'])),
+                'jenis_barang' => 'bahan_baku',
                 'satuan' => $this->normalizeSatuan($this->optionalExcelValue($row, $columns, ['satuan'])),
                 'harga_beli' => $this->normalizeNumber($row[$columns['harga_beli']]),
                 'harga_jual' => $this->normalizeNumber($row[$columns['harga_jual']]),
                 'stok' => 0,
             ];
-            $data = $this->withManufacturedItemDefaults($data);
 
             if (implode('', array_map('strval', $data)) === '') {
                 continue;
@@ -180,7 +164,9 @@ class BarangController extends Controller
 
     private function validatedData(Request $request, ?Barang $barang = null, bool $includeStock = true): array
     {
-        $this->prepareManufacturedItemDefaults($request, $includeStock);
+        $request->merge([
+            'jenis_barang' => 'bahan_baku',
+        ]);
 
         $data = $request->validate($this->rules($barang, includeStock: $includeStock));
 
@@ -211,46 +197,9 @@ class BarangController extends Controller
         return $rules;
     }
 
-    private function prepareManufacturedItemDefaults(Request $request, bool $includeStock): void
-    {
-        if ($request->input('jenis_barang') !== 'barang_jadi') {
-            return;
-        }
-
-        $request->merge($this->withManufacturedItemDefaults($request->all(), $includeStock));
-    }
-
-    private function withManufacturedItemDefaults(array $data, bool $includeStock = true): array
-    {
-        if (($data['jenis_barang'] ?? null) !== 'barang_jadi') {
-            return $data;
-        }
-
-        $data['harga_beli'] = 0;
-        $data['harga_jual'] = 0;
-
-        if ($includeStock) {
-            $data['stok'] = 0;
-        }
-
-        return $data;
-    }
-
     private function normalizeNumber(mixed $value): string
     {
         return str_replace(',', '.', trim((string) $value));
-    }
-
-    private function normalizeJenisBarang(mixed $value): string
-    {
-        $value = strtolower(trim((string) $value));
-        $value = str_replace([' ', '-'], '_', $value);
-
-        return match ($value) {
-            'barang_jadi', 'finished_good', 'finished_goods' => 'barang_jadi',
-            'bahan_baku', 'barang_baku', 'raw_material', 'raw_materials', '' => 'bahan_baku',
-            default => 'bahan_baku',
-        };
     }
 
     private function normalizeSatuan(mixed $value): string

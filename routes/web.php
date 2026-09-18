@@ -43,4 +43,5 @@ Route::post('/pembelian/{pembelian}/bayar', [PembelianController::class, 'bayar'
 Route::resource('pembelian', PembelianController::class)->only(['index', 'create', 'store', 'show']);
 
 Route::get('/transaksi/autocomplete', [TransaksiController::class, 'autocomplete'])->name('transaksi.autocomplete');
+Route::get('/transaksi/{transaksi}/struk', [TransaksiController::class, 'struk'])->name('transaksi.struk');
 Route::resource('transaksi', TransaksiController::class)->only(['index', 'create', 'store', 'show']);

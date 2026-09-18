@@ -15,7 +15,10 @@
                 <p>{{ $transaksi->kode_transaksi }}</p>
                 <h1>Detail Transaksi</h1>
             </div>
-            <a class="primary-button" href="{{ route('transaksi.create') }}">Transaksi Baru</a>
+            <div class="row-actions">
+                <a class="secondary-button" href="{{ route('transaksi.struk', $transaksi) }}" target="_blank">Print Struk</a>
+                <a class="primary-button" href="{{ route('transaksi.create') }}">Transaksi Baru</a>
+            </div>
         </header>
 
         @if (session('success'))

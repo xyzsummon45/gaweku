@@ -155,6 +155,13 @@ class TransaksiController extends Controller
         return view('transaksi.show', compact('transaksi'));
     }
 
+    public function struk(Transaksi $transaksi)
+    {
+        $transaksi->load('items');
+
+        return view('transaksi.struk', compact('transaksi'));
+    }
+
     public function autocomplete(Request $request)
     {
         $keyword = trim((string) $request->query('q'));

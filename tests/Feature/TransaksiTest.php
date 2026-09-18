@@ -93,4 +93,42 @@ class TransaksiTest extends TestCase
             ->assertSee('TRX-20260703-0001')
             ->assertDontSee('TRX-20260702-0001');
     }
+
+    public function test_transaction_receipt_can_be_opened_for_printing(): void
+    {
+        $transaksi = Transaksi::create([
+            'kode_transaksi' => 'TRX-20260918-0001',
+            'tanggal' => Carbon::parse('2026-09-18 12:00:00'),
+            'total' => 20000,
+        ]);
+
+        $transaksi->items()->create([
+            'barang_id' => Barang::create([
+                'kode_barang' => 'AAA11',
+                'nama_barang' => 'SEMEN PUTIH',
+                'harga_beli' => 15000,
+                'harga_jual' => 20000,
+                'stok' => 1,
+            ])->id,
+            'kode_barang' => 'AAA11',
+            'nama_barang' => 'SEMEN PUTIH',
+            'harga_jual' => 20000,
+            'harga_modal' => 15000,
+            'qty' => 1,
+            'subtotal' => 20000,
+            'subtotal_modal' => 15000,
+            'laba_kotor' => 5000,
+        ]);
+
+        $this->get(route('transaksi.show', $transaksi))
+            ->assertOk()
+            ->assertSee('Print Struk');
+
+        $this->get(route('transaksi.struk', $transaksi))
+            ->assertOk()
+            ->assertSee('T.B GLOBAL JAYA')
+            ->assertSee('TRX-20260918-0001')
+            ->assertSee('SEMEN PUTIH')
+            ->assertSee('Rp 20.000');
+    }
 }
